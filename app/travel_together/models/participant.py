@@ -13,7 +13,8 @@ from sqlalchemy import Enum as SQLEnum, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infra.database import Base
+from app.infra.database.database import Base
+from app.users.user_profile.models import User
 
 
 class ParticipanStatus(str, Enum):
@@ -38,4 +39,6 @@ class TripParticipan(Base):
         DateTime(timezone=True), default=dt.utcnow)
 
     trip: Mapped["Trip"] = relationship(back_populates="participants")
-    user: Mapped["User"] = relationship(back_populates="participations")
+    user: Mapped["User"] = relationship(
+        back_populates="participations"
+    )

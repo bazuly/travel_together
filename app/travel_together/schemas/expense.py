@@ -4,7 +4,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from travel_together.models import ExpenseCategory
+from app.travel_together.models import ExpenseCategory
 
 
 class ExpenseShareCreate(BaseModel):

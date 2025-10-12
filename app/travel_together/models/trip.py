@@ -16,14 +16,16 @@ from sqlalchemy import String, Text, DateTime, Float, Integer, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infra.database import Base
+from app.infra.database.database import Base
+from app.users.user_profile.models import User
 
 
 class Trip(Base):
     __tablename__ = "trips"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid4)
+        UUID(as_uuid=True), primary_key=True, default=uuid4
+    )
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str | None] = mapped_column(Text)
     destination: Mapped[str] = mapped_column(String(255))
@@ -36,8 +38,11 @@ class Trip(Base):
     created_at: Mapped[dt] = mapped_column(
         DateTime(timezone=True), default=dt.utcnow)
 
+    # nullable=True because we need to create a trip without an organizer
+    # keep this field nullable for now
     organizer_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"))
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True
+    )
 
     organizer: Mapped["User"] = relationship(
         back_populates="trips_as_organizer", foreign_keys=[organizer_id]

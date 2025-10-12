@@ -15,7 +15,8 @@ from sqlalchemy import Enum as SQLEnum, DateTime, String, Float, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infra.database import Base
+from app.infra.database.database import Base
+from app.users.user_profile.models import User
 
 
 class ExpenseCategory(str, Enum):

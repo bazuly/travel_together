@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .trip import Trip
     from users.user_profile import User
 
 from datetime import datetime as dt
@@ -11,7 +12,8 @@ from sqlalchemy import Text, Integer, ForeignKey, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infra.database import Base
+from app.infra.database.database import Base
+from app.users.user_profile.models import User
 
 
 class Review(Base):
@@ -20,7 +22,8 @@ class Review(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     rating: Mapped[int] = mapped_column(Integer)
     comment: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
+    created_at: Mapped[dt] = mapped_column(
+        DateTime(timezone=True), default=dt.utcnow)
 
     # пользователь который оставляет отзыв
     reviewer_id: Mapped[uuid.UUID] = mapped_column(
@@ -37,3 +40,9 @@ class Review(Base):
     reviewed_user: Mapped["User"] = relationship(
         back_populates="reviews_received", foreign_keys=[reviewed_user_id]
     )
+
+    # связь с поездкой
+    trip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("trips.id")
+    )
+    trip: Mapped["Trip"] = relationship(back_populates="reviews")
