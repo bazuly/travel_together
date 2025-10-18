@@ -2,8 +2,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from travel_together.models import (
+    from app.travel_together.models import (
         Expense,
+        ExpenseShare,
         Review,
         Trip,
         TripParticipan,
@@ -16,7 +17,7 @@ from sqlalchemy import String, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infra.database import Base
+from app.infra.database.database import Base
 
 
 class User(Base):
@@ -37,6 +38,7 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(back_populates="payer")
+    expense_shares: Mapped[list["ExpenseShare"]] = relationship(back_populates="user")
     reviews_given: Mapped[list["Review"]] = relationship(
         foreign_keys="Review.reviewer_id", back_populates="reviewer"
     )
