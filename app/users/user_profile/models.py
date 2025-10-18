@@ -10,7 +10,6 @@ if TYPE_CHECKING:
         TripParticipan,
     )
 
-import uuid
 from uuid import uuid4
 
 from sqlalchemy import String, Boolean
@@ -29,8 +28,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     full_name: Mapped[str] = mapped_column(String(255))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    yandex_id: Mapped[str | None] = mapped_column(
-        String(100), unique=True)  # oauth2
+    yandex_id: Mapped[str | None] = mapped_column(String(100), unique=True)  # oauth2
 
     trips_as_organizer: Mapped[list["Trip"]] = relationship(
         back_populates="organizer", foreign_keys="Trip.organizer_id"
@@ -39,8 +37,7 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(back_populates="payer")
-    expense_shares: Mapped[list["ExpenseShare"]
-                           ] = relationship(back_populates="user")
+    expense_shares: Mapped[list["ExpenseShare"]] = relationship(back_populates="user")
     reviews_given: Mapped[list["Review"]] = relationship(
         foreign_keys="Review.reviewer_id", back_populates="reviewer"
     )

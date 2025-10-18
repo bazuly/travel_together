@@ -16,7 +16,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infra.database.database import Base
-from app.users.user_profile.models import User
 
 
 class ExpenseCategory(str, Enum):
@@ -35,15 +34,18 @@ class Expense(Base):
     amount: Mapped[float] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String(3), default="USD")
     category: Mapped[ExpenseCategory] = mapped_column(SQLEnum(ExpenseCategory))
-    created_at: Mapped[dt] = mapped_column(
-        DateTime(timezone=True), default=dt.utcnow)
+    created_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
 
     payer_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"))
-    payer: Mapped["User"] = relationship(back_populates="expenses")
+        UUID(as_uuid=True), ForeignKey("users.id")
+    )
+    payer: Mapped["app.users.user_profile.models.User"] = relationship(
+        back_populates="expenses"
+    )
 
     trip_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("trips.id"))
+        UUID(as_uuid=True), ForeignKey("trips.id")
+    )
     trip: Mapped["Trip"] = relationship(back_populates="expenses")
 
     shared_with: Mapped[list["ExpenseShare"]] = relationship(
