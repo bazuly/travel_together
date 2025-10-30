@@ -1,19 +1,33 @@
-from dataclasses import dataclass
+import uuid
 
-from app.users.auth.schema import UserLoginSchema
-from app.users.auth.service import AuthService
-from app.users.user_profile.repository import UserRepository
-from app.users.user_profile.schema import UserCreateSchema
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from .repository import UserRepository
+from .models import User
+from .schemas import UserCreateSchema, UserResponseSchema
 
 
-@dataclass
 class UserService:
-    user_repository: UserRepository
-    auth_service: AuthService
+    def __init__(self, db_session: AsyncSession):
+        self.user_repository = UserRepository(db_session)
 
-    async def create_user(self, username: str, password: str) -> UserLoginSchema:
-        user_data_create = UserCreateSchema(username=username, password=password)
-        user = await self.user_repository.create_user(user_data_create)
-        access_token = self.auth_service.generate_access_token(user_id=user.id)
-        print(user)
-        return UserLoginSchema(user_id=user.id, access_token=access_token)
+    async def create_user(self, user_data: UserCreateSchema) -> UserResponseSchema:
+        user: User = await self.user_repository.create_user(user_data)
+        return UserResponseSchema.model_validate(user)
+
+    async def get_user_by_email(self, email: str) -> UserResponseSchema:
+        user = await self.user_repository.get_user_by_email(email)
+        return UserResponseSchema.model_validate(user)
+
+    async def get_user_by_id(self, user_id: uuid.UUID) -> UserResponseSchema:
+        user = await self.user_repository.get_user_by_id(user_id)
+        return UserResponseSchema.model_validate(user)
+
+    async def update_user(
+        self, user_id: uuid.UUID, user_data: UserCreateSchema
+    ) -> UserResponseSchema:
+        user = await self.user_repository.update_user(user_id, user_data)
+        return UserResponseSchema.model_validate(user)
+
+    async def delete_user(self, user_id: uuid.UUID) -> None:
+        await self.user_repository.delete_user(user_id)

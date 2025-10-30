@@ -1,14 +1,8 @@
-from pydantic import BaseModel, Field
+import uuid
 
-
-class YandexUserData(BaseModel):
-    id: int
-    login: str
-    name: str = Field(alias="real_name")
-    default_email: str
-    access_token: str
+from pydantic import BaseModel
 
 
 class UserLoginSchema(BaseModel):
-    user_id: int
+    user_id: uuid.UUID
     access_token: str

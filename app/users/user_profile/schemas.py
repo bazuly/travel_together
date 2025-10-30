@@ -1,8 +1,23 @@
-from pydantic import BaseModel
+from uuid import UUID
+from pydantic import BaseModel, EmailStr
 
 
 class UserCreateSchema(BaseModel):
-    username: str | None = None
-    password: str | None = None
-    email: str | None = None
-    yandex_access_token: str | None = None
+    email: EmailStr
+    password: str
+    full_name: str
+    is_active: bool = True
+
+
+class UserResponseSchema(BaseModel):
+    id: UUID
+    email: EmailStr
+    password: str
+    full_name: str
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class UserUpdateSchema(UserCreateSchema): ...

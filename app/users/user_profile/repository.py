@@ -1,37 +1,54 @@
-from dataclasses import dataclass
+import uuid
 
-from sqlalchemy import insert, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import insert, select, update, delete
 
-from app.users.user_profile.models import UserProfile
-from app.users.user_profile.schema import UserCreateSchema
+from app.base_repository import BaseRepository
+from app.exceptions import UserNotFoundError
+
+from app.users.user_profile.models import User
+from app.users.user_profile.schemas import UserUpdateSchema, UserCreateSchema
 
 
-@dataclass
-class UserRepository:
-    db_session: AsyncSession
+class UserRepository(BaseRepository):
+    async def create_user(self, user_data: UserCreateSchema) -> User:
+        query = insert(User).values(**user_data.model_dump()).returning(User)
+        result = await self._execute_write(query)
+        return result.scalar_one_or_none()
 
-    async def create_user(self, user_data: UserCreateSchema) -> UserProfile:
+    async def get_user_by_email(self, email: str) -> User:
+        query = select(User).where(User.email == email)
+        result = await self._execute_read(query)
+        user = result.scalar_one_or_none()
+        if user is None:
+            raise UserNotFoundError(email)
+        return user
+
+    async def get_user_by_id(self, user_id: uuid.UUID) -> User:
+        query = select(User).where(User.id == user_id)
+        result = await self._execute_read(query)
+        user = result.scalar_one_or_none()
+        if user is None:
+            raise UserNotFoundError(str(user_id))
+        return user
+
+    async def update_user(
+        self, user_id: uuid.UUID, user_data: UserUpdateSchema
+    ) -> User:
         query = (
-            insert(UserProfile)
-            .values(**user_data.dict(exclude_none=True))
-            .returning(UserProfile.id)
+            update(User)
+            .where(User.id == user_id)
+            .values(**user_data.model_dump())
+            .returning(User)
         )
-        print(query)
-        async with self.db_session as session:
-            user_id: int = (await session.execute(query)).scalar()
-            await session.commit()
-            await session.flush()
-            return await self.get_user(user_id)
+        result = await self._execute_write(query)
+        user = result.scalar_one_or_none()
+        if user is None:
+            raise UserNotFoundError(str(user_id))
+        return user
 
-    async def get_user(self, user_id: int) -> UserProfile | None:
-        query = select(UserProfile).where(UserProfile.id == user_id)
-        async with self.db_session as session:
-            user = (await session.execute(query)).scalar_one_or_none()
-            return user
-
-    async def get_user_by_mail(self, email: str) -> UserProfile | None:
-        query = select(UserProfile).where(UserProfile.email == email)
-        async with self.db_session as session:
-            user = (await session.execute(query)).scalar_one_or_none()
-            return user
+    async def delete_user(self, user_id: uuid.UUID) -> bool:
+        query = delete(User).where(User.id == user_id)
+        result = await self._execute_write(query)
+        if result.rowcount == 0:
+            raise UserNotFoundError(str(user_id))
+        return result.rowcount > 0

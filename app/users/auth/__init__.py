@@ -1,3 +1,3 @@
-from .schemas import YandexUserData
+from .schemas import UserLoginSchema
 
-__all__ = ["YandexUserData"]
+__all__ = ["UserLoginSchema"]

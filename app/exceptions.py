@@ -1,3 +1,11 @@
+import uuid
+
+
+# =============================================================================
+# DATABASE LAYER EXCEPTIONS
+# =============================================================================
+
+
 class DatabaseError(Exception):
     """Base exception for all database errors."""
 
@@ -24,31 +32,57 @@ class RepositoryError(DatabaseError):
         super().__init__(message)
 
 
-class HandlerError(Exception):
-    """Base exception for all handler errors."""
+# =============================================================================
+# USER REPOSITORY LAYER EXCEPTIONS
+# =============================================================================
+
+
+class UserRepositoryError(Exception):
+    """Base exception for all service layer errors."""
 
     pass
 
 
-class TripNotFoundError(HandlerError):
-    """Exception raised when a trip is not found."""
+class UserNotFoundError(UserRepositoryError):
+    """Exception raised when a user is not found in service layer."""
 
-    def __init__(self, trip_id: str):
+    def __init__(self, user_data: str | uuid.UUID):
+        self.user_data = user_data
+        if isinstance(user_data, str):
+            super().__init__(f"User with email {user_data} not found.")
+        else:
+            super().__init__(f"User with id {user_data} not found.")
+
+
+# =============================================================================
+# TRIP REPOSITORY LAYER EXCEPTIONS
+# =============================================================================
+
+
+class TripRepositoryError(Exception):
+    """Base exception for all service layer errors."""
+
+    pass
+
+
+class TripNotFoundError(TripRepositoryError):
+    """Exception raised when a trip is not found in service layer."""
+
+    def __init__(self, trip_id: uuid.UUID):
         self.trip_id = trip_id
         super().__init__(f"Trip with id {trip_id} not found.")
 
 
-class TripAlreadyExistsError(HandlerError):
-    """Exception raised when trying to create a trip that already exists."""
+class UserNotFoundExceptionAuth(Exception):
+    """Exception raised when a user is not found in auth layer."""
 
-    def __init__(self, trip_id: str):
-        self.trip_id = trip_id
-        super().__init__(f"Trip with id {trip_id} already exists.")
+    def __init__(self):
+        super().__init__("Can not authenticated user")
 
 
-class InvalidTripDataError(HandlerError):
-    """Exception raised when trip data is invalid."""
+class UserIncorrectPasswordException(Exception):
+    """Exception raised when a user is not found in auth layer."""
 
-    def __init__(self, details: str):
-        self.details = details
-        super().__init__(f"Invalid trip data: {details}")
+    def __init__(self, user):
+        self.user = user.email
+        super().__init__(f"Incorrect password for user {user.email}.")

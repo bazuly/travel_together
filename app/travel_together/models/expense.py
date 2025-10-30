@@ -39,10 +39,7 @@ class Expense(Base):
     payer_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id")
     )
-    payer: Mapped["app.users.user_profile.models.User"] = relationship(
-        back_populates="expenses"
-    )
-
+    payer: Mapped["User"] = relationship(back_populates="expenses")
     trip_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("trips.id")
     )
