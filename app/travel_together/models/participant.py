@@ -31,14 +31,12 @@ class TripParticipan(Base):
         UUID(as_uuid=True), ForeignKey("trips.id"), primary_key=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"))
+        UUID(as_uuid=True), ForeignKey("users.id")
+    )
     status: Mapped[ParticipanStatus] = mapped_column(
         SQLEnum(ParticipanStatus), default=ParticipanStatus.PENDING
     )
-    joined_at: Mapped[dt] = mapped_column(
-        DateTime(timezone=True), default=dt.utcnow)
+    joined_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
 
     trip: Mapped["Trip"] = relationship(back_populates="participants")
-    user: Mapped["User"] = relationship(
-        back_populates="participations"
-    )
+    user: Mapped["User"] = relationship(back_populates="participations")

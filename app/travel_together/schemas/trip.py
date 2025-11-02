@@ -19,9 +19,7 @@ class TripCreate(BaseModel):
 
 class TripResponse(TripCreate):
     id: uuid.UUID = Field(..., json_schema_serialization_defaults={"type": "string"})
-    # TODO remove optional later
-    # прокинуть айдишник организатора естесна
-    organizer_id: Optional[uuid.UUID]
+    organizer_id: uuid.UUID
     created_at: datetime
 
     class Config:
