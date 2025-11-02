@@ -1,11 +1,7 @@
 from typing import AsyncGenerator
 
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import (
-    create_async_engine,
-    async_sessionmaker,
-    AsyncSession
-)
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from app.exceptions import RepositoryError
 from app.config import get_settings
 
@@ -18,7 +14,7 @@ engine = create_async_engine(
 AsyncSessionFactory = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def get_db_session() -> AsyncGenerator[AsyncSession]:
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionFactory() as session:
         try:
             yield session

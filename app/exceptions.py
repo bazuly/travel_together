@@ -1,3 +1,11 @@
+import uuid
+
+
+# =============================================================================
+# DATABASE LAYER EXCEPTIONS
+# =============================================================================
+
+
 class DatabaseError(Exception):
     """Base exception for all database errors."""
 
@@ -24,31 +32,20 @@ class RepositoryError(DatabaseError):
         super().__init__(message)
 
 
-class HandlerError(Exception):
-    """Base exception for all handler errors."""
+# =============================================================================
+# TRIP REPOSITORY LAYER EXCEPTIONS
+# =============================================================================
+
+
+class TripRepositoryError(Exception):
+    """Base exception for all service layer errors."""
 
     pass
 
 
-class TripNotFoundError(HandlerError):
-    """Exception raised when a trip is not found."""
+class TripNotFoundError(TripRepositoryError):
+    """Exception raised when a trip is not found in service layer."""
 
-    def __init__(self, trip_id: str):
+    def __init__(self, trip_id: uuid.UUID):
         self.trip_id = trip_id
         super().__init__(f"Trip with id {trip_id} not found.")
-
-
-class TripAlreadyExistsError(HandlerError):
-    """Exception raised when trying to create a trip that already exists."""
-
-    def __init__(self, trip_id: str):
-        self.trip_id = trip_id
-        super().__init__(f"Trip with id {trip_id} already exists.")
-
-
-class InvalidTripDataError(HandlerError):
-    """Exception raised when trip data is invalid."""
-
-    def __init__(self, details: str):
-        self.details = details
-        super().__init__(f"Invalid trip data: {details}")
