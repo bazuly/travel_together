@@ -54,6 +54,21 @@ class UserNotFoundError(UserRepositoryError):
             super().__init__(f"User with id {user_data} not found.")
 
 
+class UserNotFoundExceptionAuth(Exception):
+    """Exception raised when a user is not found in auth layer."""
+
+    def __init__(self):
+        super().__init__("Can not authenticated user")
+
+
+class UserIncorrectPasswordException(Exception):
+    """Exception raised when a user is not found in auth layer."""
+
+    def __init__(self, user):
+        self.user = user.email
+        super().__init__(f"Incorrect password for user {user.email}.")
+
+
 # =============================================================================
 # TRIP REPOSITORY LAYER EXCEPTIONS
 # =============================================================================
@@ -71,18 +86,3 @@ class TripNotFoundError(TripRepositoryError):
     def __init__(self, trip_id: uuid.UUID):
         self.trip_id = trip_id
         super().__init__(f"Trip with id {trip_id} not found.")
-
-
-class UserNotFoundExceptionAuth(Exception):
-    """Exception raised when a user is not found in auth layer."""
-
-    def __init__(self):
-        super().__init__("Can not authenticated user")
-
-
-class UserIncorrectPasswordException(Exception):
-    """Exception raised when a user is not found in auth layer."""
-
-    def __init__(self, user):
-        self.user = user.email
-        super().__init__(f"Incorrect password for user {user.email}.")
