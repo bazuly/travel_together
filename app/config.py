@@ -11,12 +11,6 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     DB_NAME: str
 
-    # Yandex settings
-    YANDEX_CLIENT_ID: str = ""
-    YANDEX_SECRET_KEY: str = ""
-    YANDEX_REDIRECT_URL: str = ""
-    YANDEX_TOKEN_URL: str = ""
-
     # JWT settings
     JWT_SECRET_KEY: str
     ALGORITHM: str
