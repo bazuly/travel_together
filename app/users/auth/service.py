@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import uuid
 
-from fastapi import HTTPException, status, Security, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import HTTPException, status
+from fastapi.security import HTTPBearer
 from jose import jwt
 
 from app.config import Settings

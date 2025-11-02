@@ -6,8 +6,6 @@ from app.travel_together.models import Trip
 from app.base_repository import BaseRepository
 from app.exceptions import TripNotFoundError
 
-from .schemas import TripCreate
-
 
 class TripRepository(BaseRepository):
     async def create_trip(self, trip_data: dict) -> Trip:

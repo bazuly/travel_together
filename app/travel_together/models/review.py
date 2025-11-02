@@ -22,8 +22,7 @@ class Review(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     rating: Mapped[int] = mapped_column(Integer)
     comment: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[dt] = mapped_column(
-        DateTime(timezone=True), default=dt.utcnow)
+    created_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
 
     # пользователь который оставляет отзыв
     reviewer_id: Mapped[uuid.UUID] = mapped_column(
