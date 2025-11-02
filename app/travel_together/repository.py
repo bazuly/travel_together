@@ -10,8 +10,8 @@ from .schemas import TripCreate
 
 
 class TripRepository(BaseRepository):
-    async def create_trip(self, trip: TripCreate) -> Trip:
-        query = insert(Trip).values(**trip.model_dump()).returning(Trip)
+    async def create_trip(self, trip_data: dict) -> Trip:
+        query = insert(Trip).values(**trip_data).returning(Trip)
         result = await self._execute_write(query)
         return result.scalar_one_or_none()
 
@@ -23,13 +23,8 @@ class TripRepository(BaseRepository):
             raise TripNotFoundError(str(trip_id))
         return trip_data
 
-    async def update_trip(self, trip_id: uuid.UUID, trip: TripCreate) -> Trip:
-        query = (
-            update(Trip)
-            .where(Trip.id == trip_id)
-            .values(**trip.model_dump())
-            .returning(Trip)
-        )
+    async def update_trip(self, trip_id: uuid.UUID, trip: dict) -> Trip:
+        query = update(Trip).where(Trip.id == trip_id).values(**trip).returning(Trip)
         result = await self._execute_write(query)
         trip_data = result.scalars().one_or_none()
         if trip_data is None:

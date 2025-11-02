@@ -1,4 +1,5 @@
-from fastapi import Depends
+from fastapi import Depends, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infra.database.accessor import get_db_session
@@ -9,6 +10,7 @@ from .config import get_settings
 
 
 settings = get_settings()
+bearer_scheme = HTTPBearer(auto_error=True)
 
 
 def get_trip_service(db_session: AsyncSession = Depends(get_db_session)) -> TripService:
@@ -26,3 +28,10 @@ async def get_auth_service(
         settings=settings,
         user_service=user_service,
     )
+
+
+async def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
+    auth_service: AuthService = Depends(get_auth_service),
+) -> UserService:
+    return await auth_service.decode_token(token=credentials.credentials)
