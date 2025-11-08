@@ -33,7 +33,7 @@ class RepositoryError(DatabaseError):
 
 
 # =============================================================================
-# USER REPOSITORY LAYER EXCEPTIONS
+# USER LAYER EXCEPTIONS
 # =============================================================================
 
 
@@ -70,7 +70,7 @@ class UserIncorrectPasswordException(Exception):
 
 
 # =============================================================================
-# TRIP REPOSITORY LAYER EXCEPTIONS
+# TRIP LAYER EXCEPTIONS
 # =============================================================================
 
 
@@ -86,3 +86,35 @@ class TripNotFoundError(TripRepositoryError):
     def __init__(self, trip_id: uuid.UUID):
         self.trip_id = trip_id
         super().__init__(f"Trip with id {trip_id} not found.")
+
+
+# =============================================================================
+# PARTICIPANT LAYER EXCEPTIONS
+# =============================================================================
+
+
+class PartcipantNotFoundError(Exception):
+    """Exception raised when a participant is not found in service layer."""
+
+    def __init__(self, participant_id: uuid.UUID, trip_id: uuid.UUID):
+        self.participant_id = participant_id
+        self.trip_id = trip_id
+        super().__init__(
+            f"Participant with id {participant_id} not found in trup {trip_id}."
+        )
+
+
+class ParticipantNotActiveError(Exception):
+    """Exception raised when participant status is not active."""
+
+    def __init__(self, participant_id: uuid.UUID):
+        self.participant_id = participant_id
+        super().__init__(f"Participant with id {participant_id} is not active.")
+
+
+class MaximunAmountOfParticipantsError(Exception):
+    """Exception raised when participant status is not active."""
+
+    def __init__(self, trip_id: uuid.UUID):
+        self.trip_id = trip_id
+        super().__init__(f"Trip with id {trip_id} has maximun amount of participants.")

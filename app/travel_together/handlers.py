@@ -2,9 +2,13 @@ from uuid import UUID
 
 from fastapi import Depends, APIRouter, status
 
-from app.dependency import get_trip_service, get_current_user_id
-from app.travel_together.service import TripService
-from app.travel_together.schemas import TripCreate, TripResponse
+from app.dependency import (
+    get_trip_service,
+    get_current_user_id,
+    get_participant_service,
+)
+from app.travel_together.service import TripService, ParticipantService
+from app.travel_together.schemas import TripCreate, TripResponse, ParticipantResponse
 
 
 router = APIRouter(
@@ -54,3 +58,29 @@ async def delete_trip(
     current_user_id=Depends(get_current_user_id),
 ) -> None:
     return await trip_service.delete_trip(trip_id, current_user_id)
+
+
+@router.post("/participant_join/{trip_id}", status_code=status.HTTP_200_OK)
+async def participant_join(
+    trip_id: UUID,
+    participant_service: ParticipantService = Depends(get_participant_service),
+    current_user_id=Depends(get_current_user_id),
+) -> ParticipantResponse:
+    return await participant_service.add_participant(trip_id, current_user_id)
+
+
+@router.get("/get_trip_participants/{trip_id}", status_code=status.HTTP_200_OK)
+async def get_trip_participants(
+    trip_id: UUID,
+    participant_service: ParticipantService = Depends(get_participant_service),
+) -> list[ParticipantResponse]:
+    return await participant_service.retrieve_participants(trip_id)
+
+
+@router.delete("/participant_leave/{trip_id}", status_code=status.HTTP_200_OK)
+async def participant_leave(
+    trip_id: UUID,
+    participant_service: ParticipantService = Depends(get_participant_service),
+    current_user_id=Depends(get_current_user_id),
+):
+    return await participant_service.remove_participant(trip_id, current_user_id)

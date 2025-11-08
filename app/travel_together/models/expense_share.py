@@ -18,8 +18,7 @@ from app.infra.database.database import Base
 class ExpenseShare(Base):
     __tablename__ = "expense_shares"
 
-    expense_id: Mapped[int] = mapped_column(
-        ForeignKey("expenses.id"), primary_key=True)
+    expense_id: Mapped[int] = mapped_column(ForeignKey("expenses.id"), primary_key=True)
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True
     )

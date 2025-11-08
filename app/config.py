@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
+    # trip app settings
+    MAX_PARTICIPANTS: int = 10
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
     @property
