@@ -77,10 +77,11 @@ async def get_trip_participants(
     return await participant_service.retrieve_participants(trip_id)
 
 
+# TODO: что тут возвращать нужно?
 @router.delete("/participant_leave/{trip_id}", status_code=status.HTTP_200_OK)
 async def participant_leave(
     trip_id: UUID,
     participant_service: ParticipantService = Depends(get_participant_service),
     current_user_id=Depends(get_current_user_id),
-):
+) -> None:
     return await participant_service.remove_participant(trip_id, current_user_id)

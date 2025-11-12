@@ -1,18 +1,18 @@
 import uuid
 
 from sqlalchemy import insert, select, update, delete
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-from app.travel_together.models import Trip, TripParticipan
+from app.travel_together.models import Trip, TripParticipan, ParticipanStatus
 from app.users.user_profile import UserRepository
 from app.base_repository import BaseRepository
 from app.exceptions import (
     TripNotFoundError,
     PartcipantNotFoundError,
     ParticipantNotActiveError,
-    MaximunAmountOfParticipantsError,
 )
 
 
@@ -61,29 +61,42 @@ class ParticipantRepository(BaseRepository):
     def __init__(
         self,
         db_session: AsyncSession,
-        user_repo: UserRepository | None = None,
-        trip_repo: TripRepository | None = None,
+        user_repo: UserRepository,
     ):
-        # вызываем с помощью super, т.к. намн ужна одна сессия
-        # создавать новую не нужно
-        super().__init__(db_session)
-        self.user_repo = user_repo or UserRepository(db_session)
-        self.trip_repo = trip_repo or TripRepository(db_session)
+        super().__init__(db_session=db_session)
+        self.user_repo = user_repo
 
     async def add_participant(
-        self, trip_id: uuid.UUID, user_id: uuid.UUID
-    ) -> TripParticipan:
-        user = await self.user_repo.get_user_by_id(user_id)
+        self,
+        trip_id: uuid.UUID,
+        current_user_id: uuid.UUID,
+        status=ParticipanStatus.PENDING,
+    ) -> TripParticipan | None:
+
+        user = await self.user_repo.get_user_by_id(current_user_id)
         if not user.is_active:
-            raise ParticipantNotActiveError(str(user_id))
-        query = (
-            insert(TripParticipan)
-            .values(trip_id=trip_id, user_id=user_id)
+            raise ParticipantNotActiveError(str(current_user_id))
+
+        # Если участник уже добавлен, возвращаем участника
+        existing = await self.check_participant_exists(
+            user_id=current_user_id, trip_id=trip_id
+        )
+        if existing:
+            return existing
+
+        stmt = (
+            pg_insert(TripParticipan)
+            .values(
+                trip_id=trip_id,
+                user_id=user.id,
+                status=status,
+            )
+            .on_conflict_do_nothing(index_elements=["trip_id", "user_id"])
             .returning(TripParticipan)
         )
-        result = await self._execute_write(query)
-        participant_data = result.scalar_one_or_none()
-        return participant_data
+
+        result = await self._execute_write(stmt)
+        return result.scalar_one_or_none()
 
     async def remove_participant(self, trip_id: uuid.UUID, user_id: uuid.UUID) -> bool:
         query = delete(TripParticipan).where(

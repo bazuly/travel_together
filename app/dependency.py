@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import Depends, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +8,11 @@ from app.infra.database.accessor import get_db_session
 from app.users.auth.service import AuthService
 from app.users.user_profile.service import UserService
 from app.travel_together.service import TripService, ParticipantService
+from app.travel_together.repository import (
+    UserRepository,
+    ParticipantRepository,
+    TripRepository,
+)
 from .config import get_settings
 
 
@@ -13,8 +20,26 @@ settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=True)
 
 
-def get_trip_service(db_session: AsyncSession = Depends(get_db_session)) -> TripService:
-    return TripService(db_session)
+def get_user_repository(
+    db_session: AsyncSession = Depends(get_db_session),
+) -> UserRepository:
+    return UserRepository(db_session)
+
+
+def get_trip_repository(
+    db_session: AsyncSession = Depends(get_db_session),
+) -> TripRepository:
+    return TripRepository(db_session)
+
+
+def get_participant_repository(
+    db_session: AsyncSession = Depends(get_db_session),
+    user_repo: UserRepository = Depends(get_user_repository),
+) -> ParticipantRepository:
+    return ParticipantRepository(
+        db_session=db_session,
+        user_repo=user_repo,
+    )
 
 
 def get_user_service(db_session: AsyncSession = Depends(get_db_session)) -> UserService:
@@ -31,14 +56,28 @@ def get_auth_service(
     )
 
 
-def get_participant_service(
-    db_session: AsyncSession = Depends(get_db_session),
-) -> ParticipantService:
-    return ParticipantService(db_session)
-
-
 async def get_current_user_id(
     credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
     auth_service: AuthService = Depends(get_auth_service),
-) -> UserService:
+) -> uuid.UUID:
     return await auth_service.decode_token(token=credentials.credentials)
+
+
+def get_trip_service(
+    trip_repo: TripRepository = Depends(get_trip_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
+) -> TripService:
+    return TripService(
+        trip_repo=trip_repo,
+        participant_repo=participant_repo,
+    )
+
+
+def get_participant_service(
+    trip_repo: TripRepository = Depends(get_trip_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
+) -> ParticipantService:
+    return ParticipantService(
+        trip_repo=trip_repo,
+        participant_repo=participant_repo,
+    )

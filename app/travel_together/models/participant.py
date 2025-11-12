@@ -5,11 +5,10 @@ if TYPE_CHECKING:
     from users.user_profile import User
     from .trip import Trip
 
-from datetime import datetime as dt
 from enum import Enum
 import uuid
 
-from sqlalchemy import Enum as SQLEnum, DateTime, ForeignKey
+from sqlalchemy import Enum as SQLEnum, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -26,17 +25,19 @@ class ParticipanStatus(str, Enum):
 
 class TripParticipan(Base):
     __tablename__ = "trip_participans"
+    __table_args__ = (
+        UniqueConstraint("trip_id", "user_id", name="uq_trip_participant"),
+    )
 
     trip_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("trips.id"), primary_key=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id")
+        UUID(as_uuid=True), ForeignKey("users.id"), primary_key=True
     )
     status: Mapped[ParticipanStatus] = mapped_column(
         SQLEnum(ParticipanStatus), default=ParticipanStatus.PENDING
     )
-    joined_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
 
     trip: Mapped["Trip"] = relationship(back_populates="participants")
     user: Mapped["User"] = relationship(back_populates="participations")
