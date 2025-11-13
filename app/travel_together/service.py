@@ -2,12 +2,16 @@ import uuid
 
 from app.config import Settings
 from app.travel_together.models.participant import ParticipanStatus
+from app.exceptions import (
+    TripOrganizerRequiredError,
+    AlreadyTripParticipant,
+    ReachedMaxParticipants,
+)
 from .repository import TripRepository, ParticipantRepository
 from .schemas import TripCreate, TripResponse, ParticipantResponse
 
 
 class TripService:
-
     def __init__(
         self,
         trip_repo: TripRepository,
@@ -45,7 +49,7 @@ class TripService:
         existing_trip = await self.trip_repo.retrieve_trip(trip_id)
 
         if existing_trip.organizer_id != current_user_id:
-            raise PermissionError
+            raise TripOrganizerRequiredError("Only the organaizer can delete trip")
 
         trip_data = trip.model_dump()
         # не меняем организатора + явно его сохраняем
@@ -57,9 +61,8 @@ class TripService:
     async def delete_trip(self, trip_id: uuid.UUID, current_user_id: uuid.UUID) -> None:
         trip = await self.trip_repo.retrieve_trip(trip_id)
 
-        # TODO: нужны наверное номральные ерроры
         if trip.organizer_id != current_user_id:
-            raise PermissionError
+            raise TripOrganizerRequiredError("Only the organaizer can update trip")
         return await self.trip_repo.delete_trip(trip_id)
 
 
@@ -81,14 +84,16 @@ class ParticipantService:
         trip = await self.trip_repo.retrieve_trip_for_update(trip_id)
 
         if trip.organizer_id == user_id:
-            raise ValueError("Organizer is already a participant with ACCEPTED status.")
+            raise AlreadyTripParticipant(
+                "Organizer is already a participant with ACCEPTED status."
+            )
 
         current_amount_participants = await self.participant_repo.participants_count(
             trip_id
         )
-        # TODO: Нормальный эксепшен нужен
+
         if current_amount_participants >= self.settings.MAX_PARTICIPANTS:
-            raise ValueError("Reached max amount of participants")
+            raise ReachedMaxParticipants("Reached max amount of participants")
 
         result = await self.participant_repo.add_participant(
             trip_id=trip_id, current_user_id=user_id, status=ParticipanStatus.PENDING

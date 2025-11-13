@@ -88,6 +88,24 @@ class TripNotFoundError(TripRepositoryError):
         super().__init__(f"Trip with id {trip_id} not found.")
 
 
+class TripOrganizerRequiredError(Exception):
+    """Organizer required exception"""
+
+    pass
+
+
+class AlreadyTripParticipant(Exception):
+    """Exception raise when the user already participant"""
+
+    pass
+
+
+class ReachedMaxParticipants(Exception):
+    """Exception raise if reached maximum amount of participants"""
+
+    pass
+
+
 # =============================================================================
 # PARTICIPANT LAYER EXCEPTIONS
 # =============================================================================
