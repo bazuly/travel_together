@@ -21,7 +21,7 @@ def get_user_service(db_session: AsyncSession = Depends(get_db_session)) -> User
     return UserService(db_session)
 
 
-async def get_auth_service(
+def get_auth_service(
     user_service: UserService = Depends(get_user_service),
 ) -> AuthService:
     return AuthService(

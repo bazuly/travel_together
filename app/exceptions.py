@@ -33,7 +33,7 @@ class RepositoryError(DatabaseError):
 
 
 # =============================================================================
-# USER REPOSITORY LAYER EXCEPTIONS
+# USER LAYER EXCEPTIONS
 # =============================================================================
 
 
@@ -70,7 +70,7 @@ class UserIncorrectPasswordException(Exception):
 
 
 # =============================================================================
-# TRIP REPOSITORY LAYER EXCEPTIONS
+# TRIP LAYER EXCEPTIONS
 # =============================================================================
 
 
@@ -86,3 +86,9 @@ class TripNotFoundError(TripRepositoryError):
     def __init__(self, trip_id: uuid.UUID):
         self.trip_id = trip_id
         super().__init__(f"Trip with id {trip_id} not found.")
+
+
+class TripOrganizerRequiredError(Exception):
+    """Organizer required exception"""
+
+    pass

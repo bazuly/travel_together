@@ -11,7 +11,6 @@ class TripCreate(BaseModel):
     destination: str
     start_date: datetime
     end_date: datetime
-    max_participants: int = Field(..., gt=1, le=10)
     budget_per_person: Optional[float] = None
     currency: str = "USD"
     is_public: bool = True
