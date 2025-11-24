@@ -30,7 +30,7 @@ class TripService:
         existing_trip = await self.repo.retrieve_trip(trip_id)
 
         if existing_trip.organizer_id != current_user_id:
-            raise TripOrganizerRequiredError("Only the organaizer can delete trip")
+            raise TripOrganizerRequiredError("Only the organizer can delete trip")
 
         trip_data = trip.model_dump()
         # не меняем организатора + явно его сохраняем
@@ -43,6 +43,6 @@ class TripService:
         trip = await self.repo.retrieve_trip(trip_id)
 
         if trip.organizer_id != current_user_id:
-            raise TripOrganizerRequiredError("Only the organaizer can update trip")
+            raise TripOrganizerRequiredError("Only the organizer can update trip")
 
         return await self.repo.delete_trip(trip_id)

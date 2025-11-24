@@ -24,7 +24,7 @@ class ParticipanStatus(str, Enum):
     LEFT = "left"
 
 
-class TripParticipan(Base):
+class TripParticipant(Base):
     __tablename__ = "trip_participans"
 
     trip_id: Mapped[uuid.UUID] = mapped_column(

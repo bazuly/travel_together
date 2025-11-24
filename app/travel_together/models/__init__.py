@@ -1,7 +1,7 @@
 from .expense_share import ExpenseShare
 from .expense import ExpenseCategory, Expense
 from .review import Review
-from .participant import ParticipanStatus, TripParticipan
+from .participant import ParticipanStatus, TripParticipant
 from .trip import Trip
 
 __all__ = [
@@ -10,6 +10,6 @@ __all__ = [
     "Expense",
     "Review",
     "ParticipanStatus",
-    "TripParticipan",
+    "TripParticipant",
     "Trip",
 ]

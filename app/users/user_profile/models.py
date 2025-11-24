@@ -7,7 +7,7 @@ if TYPE_CHECKING:
         ExpenseShare,
         Review,
         Trip,
-        TripParticipan,
+        TripParticipant,
     )
 
 import uuid
@@ -34,7 +34,7 @@ class User(Base):
     trips_as_organizer: Mapped[list["Trip"]] = relationship(
         back_populates="organizer", foreign_keys="Trip.organizer_id"
     )
-    participations: Mapped[list["TripParticipan"]] = relationship(
+    participations: Mapped[list["TripParticipant"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(back_populates="payer")

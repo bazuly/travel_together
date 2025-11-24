@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .expense import Expense
     from .review import Review
-    from .participant import TripParticipan
+    from .participant import TripParticipant
     from users.user_profile import User
 
 
@@ -42,7 +42,7 @@ class Trip(Base):
     organizer: Mapped["User"] = relationship(
         back_populates="trips_as_organizer", foreign_keys=[organizer_id]
     )
-    participants: Mapped[list["TripParticipan"]] = relationship(
+    participants: Mapped[list["TripParticipant"]] = relationship(
         back_populates="trip", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(
