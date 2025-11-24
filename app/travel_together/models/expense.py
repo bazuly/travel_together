@@ -29,7 +29,6 @@ class ExpenseCategory(str, Enum):
 class Expense(Base):
     __tablename__ = "expenses"
 
-    # TODO тоже исправить на uuid в предыдущих уроках
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(String(200))
     amount: Mapped[float] = mapped_column(Float)
