@@ -1,7 +1,7 @@
 import uuid
 
 from app.travel_together.permissions import PermissionService
-from app.travel_together.models import ParticipantStatus, ExpenseCategory
+from app.travel_together.models import ParticipantStatus
 from app.config import get_settings
 from app.exceptions import (
     AlreadyTripParticipant,
