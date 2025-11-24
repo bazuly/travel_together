@@ -13,7 +13,9 @@ router = APIRouter(
 )
 
 
-@router.post("/create_trip", response_model=TripResponse, status_code=201)
+@router.post(
+    "/create_trip", response_model=TripResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_trip(
     trip: TripCreate,
     trip_service: TripService = Depends(get_trip_service),

@@ -1,13 +1,13 @@
 services:
   db:
-    image: postgres
+    image: postgres:latest
     restart: unless-stopped
     ports:
       - "5432:5432"
     env_file:
       - ../.env
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data_1
 
 volumes:
   db_data:

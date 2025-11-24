@@ -17,28 +17,26 @@ from app.infra.database.database import Base
 from app.users.user_profile.models import User
 
 
-class ParticipanStatus(str, Enum):
+class ParticipantStatus(str, Enum):
     PENDING = "pending"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
     LEFT = "left"
 
 
-class TripParticipan(Base):
-    __tablename__ = "trip_participans"
+class TripParticipant(Base):
+    __tablename__ = "trip_participants"
 
     trip_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("trips.id"), primary_key=True
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"))
-    status: Mapped[ParticipanStatus] = mapped_column(
-        SQLEnum(ParticipanStatus), default=ParticipanStatus.PENDING
+        UUID(as_uuid=True), ForeignKey("users.id")
     )
-    joined_at: Mapped[dt] = mapped_column(
-        DateTime(timezone=True), default=dt.utcnow)
+    status: Mapped[ParticipantStatus] = mapped_column(
+        SQLEnum(ParticipantStatus), default=ParticipantStatus.PENDING
+    )
+    joined_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
 
     trip: Mapped["Trip"] = relationship(back_populates="participants")
-    user: Mapped["User"] = relationship(
-        back_populates="participations"
-    )
+    user: Mapped["User"] = relationship(back_populates="participations")

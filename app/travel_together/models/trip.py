@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .expense import Expense
     from .review import Review
-    from .participant import TripParticipan
+    from .participant import TripParticipant
     from users.user_profile import User
 
 
@@ -35,8 +35,7 @@ class Trip(Base):
     budget_per_person: Mapped[float | None] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String(3), default="USD")
     is_public: Mapped[bool] = mapped_column(default=True)
-    created_at: Mapped[dt] = mapped_column(
-        DateTime(timezone=True), default=dt.utcnow)
+    created_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
 
     # nullable=True because we need to create a trip without an organizer
     # keep this field nullable for now
@@ -47,7 +46,7 @@ class Trip(Base):
     organizer: Mapped["User"] = relationship(
         back_populates="trips_as_organizer", foreign_keys=[organizer_id]
     )
-    participants: Mapped[list["TripParticipan"]] = relationship(
+    participants: Mapped[list["TripParticipant"]] = relationship(
         back_populates="trip", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(
