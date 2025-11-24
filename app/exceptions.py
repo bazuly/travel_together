@@ -111,14 +111,14 @@ class ReachedMaxParticipants(Exception):
 # =============================================================================
 
 
-class PartcipantNotFoundError(Exception):
+class ParticipantNotFoundError(Exception):
     """Exception raised when a participant is not found in service layer."""
 
     def __init__(self, participant_id: uuid.UUID, trip_id: uuid.UUID):
         self.participant_id = participant_id
         self.trip_id = trip_id
         super().__init__(
-            f"Participant with id {participant_id} not found in trup {trip_id}."
+            f"Participant with id {participant_id} not found in trip {trip_id}."
         )
 
 
@@ -130,9 +130,44 @@ class ParticipantNotActiveError(Exception):
         super().__init__(f"Participant with id {participant_id} is not active.")
 
 
-class MaximunAmountOfParticipantsError(Exception):
+class MaximumAmountOfParticipantsError(Exception):
     """Exception raised when participant status is not active."""
 
     def __init__(self, trip_id: uuid.UUID):
         self.trip_id = trip_id
-        super().__init__(f"Trip with id {trip_id} has maximun amount of participants.")
+        super().__init__(f"Trip with id {trip_id} has maximum amount of participants.")
+
+
+class AllParticipantFromTripError(Exception):
+    """Exception raise when unable to fetch all members from trip"""
+
+    pass
+
+
+# =============================================================================
+# EXPENSE LAYER EXCEPTIONS
+# =============================================================================
+
+
+class ExpenseRepositoryError(Exception):
+    """Base exception for all service layer errors."""
+
+    pass
+
+
+class ExpenseNotFoundError(ExpenseRepositoryError):
+    """Exception raised when a trip is not found in service layer."""
+
+    def __init__(self, expense_id: uuid.UUID):
+        self.expense_id = expense_id
+        super().__init__(f"Expense with id {expense_id} not found.")
+
+
+class ExpensePayerRequiredError(Exception):
+    """Expense payer required exception"""
+
+    def __init__(self, expense_id: uuid.UUID):
+        self.expense_id = expense_id
+        super().__init__(
+            f"Only the expense creator can update or delete expense_data! Expense_id: {expense_id}"
+        )

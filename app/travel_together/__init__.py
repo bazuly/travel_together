@@ -1,4 +1,11 @@
-from .repository import TripRepository
-from .service import TripService
+from .repository import TripRepository, ParticipantRepository, ExpenseRepository
+from .service import TripService, ParticipantService, ExpenseService
 
-__all__ = ["TripRepository", "TripService"]
+__all__ = [
+    "TripRepository",
+    "TripService",
+    "ParticipantRepository",
+    "ExpenseRepository",
+    "ParticipantService",
+    "ExpenseService",
+]

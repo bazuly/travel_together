@@ -62,7 +62,7 @@ class AuthService:
         print(uuid.UUID(str(user_id)))
         return uuid.UUID(str(user_id))
 
-    async def get_current_user_id(self, token: str):
+    async def get_user_id(self, token: str):
         user_id = self.decode_token(token)
         user = await self.user_service.get_user_by_id(user_id)
         if not user:

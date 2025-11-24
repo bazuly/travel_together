@@ -29,7 +29,8 @@ class ExpenseCategory(str, Enum):
 class Expense(Base):
     __tablename__ = "expenses"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    # TODO тоже исправить на uuid в предыдущих уроках
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(String(200))
     amount: Mapped[float] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String(3), default="USD")
@@ -40,6 +41,7 @@ class Expense(Base):
         UUID(as_uuid=True), ForeignKey("users.id")
     )
     payer: Mapped["User"] = relationship(back_populates="expenses")
+
     trip_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("trips.id")
     )
