@@ -5,14 +5,18 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-from app.travel_together.models import Trip, TripParticipan, ParticipanStatus
+from app.travel_together.models import (
+    Trip,
+    TripParticipant,
+    ParticipantStatus,
+)
 from app.users.user_profile import UserRepository
 from app.base_repository import BaseRepository
 from app.exceptions import (
     TripNotFoundError,
-    PartcipantNotFoundError,
+    ParticipantNotFoundError,
     ParticipantNotActiveError,
+    AllParticipantFromTripError,
 )
 
 
@@ -69,63 +73,63 @@ class ParticipantRepository(BaseRepository):
     async def add_participant(
         self,
         trip_id: uuid.UUID,
-        current_user_id: uuid.UUID,
-        status=ParticipanStatus.PENDING,
-    ) -> TripParticipan | None:
+        user_id: uuid.UUID,
+        status=ParticipantStatus.PENDING,
+    ) -> TripParticipant | None:
 
-        user = await self.user_repo.get_user_by_id(current_user_id)
+        user = await self.user_repo.get_user_by_id(user_id)
         if not user.is_active:
-            raise ParticipantNotActiveError(str(current_user_id))
-
-        # Если участник уже добавлен, возвращаем участника
-        existing = await self.check_participant_exists(
-            user_id=current_user_id, trip_id=trip_id
-        )
-        if existing:
-            return existing
+            raise ParticipantNotActiveError(str(user_id))
 
         stmt = (
-            pg_insert(TripParticipan)
+            pg_insert(TripParticipant)
             .values(
                 trip_id=trip_id,
                 user_id=user.id,
                 status=status,
             )
             .on_conflict_do_nothing(index_elements=["trip_id", "user_id"])
-            .returning(TripParticipan)
+            .returning(TripParticipant)
         )
-
         result = await self._execute_write(stmt)
         return result.scalar_one_or_none()
 
     async def remove_participant(self, trip_id: uuid.UUID, user_id: uuid.UUID) -> bool:
-        query = delete(TripParticipan).where(
-            TripParticipan.trip_id == trip_id, TripParticipan.user_id == user_id
+        query = delete(TripParticipant).where(
+            TripParticipant.trip_id == trip_id, TripParticipant.user_id == user_id
         )
         result = await self._execute_write(query)
+        if not result:
+            raise ParticipantNotFoundError(participant_id=user_id, trip_id=trip_id)
         if result.rowcount == 0:
-            raise PartcipantNotFoundError(str(user_id), str(trip_id))
+            raise ParticipantNotFoundError(str(user_id), str(trip_id))
         return result.rowcount > 0
 
-    async def retrieve_participants(self, trip_id: uuid.UUID) -> list[TripParticipan]:
-        query = select(TripParticipan).where(TripParticipan.trip_id == trip_id)
+    async def retrieve_participant(
+        self, trip_id: uuid.UUID, user_id: uuid.UUID
+    ) -> TripParticipant | None:
+        query = select(TripParticipant).where(
+            TripParticipant.user_id == user_id, TripParticipant.trip_id == trip_id
+        )
         result = await self._execute_read(query)
+        if not result:
+            raise ParticipantNotFoundError(participant_id=user_id, trip_id=trip_id)
+        return result.scalar_one_or_none()
+
+    async def retrieve_all_participants_from_trip(
+        self, trip_id: uuid.UUID
+    ) -> list[TripParticipant]:
+        query = select(TripParticipant).where(TripParticipant.trip_id == trip_id)
+        result = await self._execute_read(query)
+        if not result:
+            raise AllParticipantFromTripError("Unable to retrieve all trip members")
         return result.scalars().all()
 
     async def participants_count(self, trip_id: uuid.UUID) -> int:
         query = (
             select(func.count())
-            .select_from(TripParticipan)
-            .where(TripParticipan.trip_id == trip_id)
+            .select_from(TripParticipant)
+            .where(TripParticipant.trip_id == trip_id)
         )
         result = await self._execute_read(query)
         return result.scalar_one()
-
-    async def check_participant_exists(
-        self, user_id: uuid.UUID, trip_id: uuid.UUID
-    ) -> TripParticipan | None:
-        query = select(TripParticipan).where(
-            TripParticipan.trip_id == trip_id, TripParticipan.user_id == user_id
-        )
-        result = await self._execute_read(query)
-        return result.scalar_one_or_none()

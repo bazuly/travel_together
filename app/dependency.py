@@ -8,6 +8,7 @@ from app.infra.database.accessor import get_db_session
 from app.users.auth.service import AuthService
 from app.users.user_profile.service import UserService
 from app.travel_together.service import TripService, ParticipantService
+from app.travel_together.permissions import PermissionService
 from app.travel_together.repository import (
     UserRepository,
     ParticipantRepository,
@@ -46,7 +47,6 @@ def get_user_service(db_session: AsyncSession = Depends(get_db_session)) -> User
     return UserService(db_session)
 
 
-# TODO: убрать async в предыдущем уроке
 def get_auth_service(
     user_service: UserService = Depends(get_user_service),
 ) -> AuthService:
@@ -56,28 +56,42 @@ def get_auth_service(
     )
 
 
-async def get_current_user_id(
+async def get_user_id(
     credentials: HTTPAuthorizationCredentials = Security(bearer_scheme),
     auth_service: AuthService = Depends(get_auth_service),
 ) -> uuid.UUID:
     return await auth_service.decode_token(token=credentials.credentials)
 
 
+def get_permission_service(
+    trip_repo: TripRepository = Depends(get_trip_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
+) -> PermissionService:
+    return PermissionService(
+        trip_repo=trip_repo,
+        participant_repo=participant_repo,
+    )
+
+
 def get_trip_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
     participant_repo: ParticipantRepository = Depends(get_participant_repository),
+    permission_service: PermissionService = Depends(get_permission_service),
 ) -> TripService:
     return TripService(
         trip_repo=trip_repo,
         participant_repo=participant_repo,
+        permission_service=permission_service,
     )
 
 
 def get_participant_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
     participant_repo: ParticipantRepository = Depends(get_participant_repository),
+    permission_service: PermissionService = Depends(get_permission_service),
 ) -> ParticipantService:
     return ParticipantService(
         trip_repo=trip_repo,
         participant_repo=participant_repo,
+        permission_service=permission_service,
     )
