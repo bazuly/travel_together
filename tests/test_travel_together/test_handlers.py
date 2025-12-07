@@ -94,7 +94,7 @@ async def test_delete_trip__success(client_with_db, test_data):
     created_trip_data = create_response.json()
     trip_id = created_trip_data["id"]
 
-    retrieve_response = await client_with_db.delete11(
+    retrieve_response = await client_with_db.delete(
         f"/trip/delete_trip/{trip_id}",
         headers=headers
     )

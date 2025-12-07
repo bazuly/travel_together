@@ -41,10 +41,6 @@ class TripRepository(BaseRepository):
         query = select(Trip).where(Trip.id == trip_id).with_for_update()
         result = await self._execute_read(query)
         trip_data = result.scalars().one_or_none()
-        # TODO:
-        # исправить в предыдущих уроках
-        # было if not result
-        # тесты не работали нормально
         if trip_data is None:
             raise TripNotFoundError(str(trip_id))
         return trip_data
@@ -106,7 +102,7 @@ class ParticipantRepository(BaseRepository):
             TripParticipant.trip_id == trip_id, TripParticipant.user_id == user_id
         )
         result = await self._execute_write(query)
-        if not result:
+        if result is None:
             raise ParticipantNotFoundError(
                 participant_id=user_id, trip_id=trip_id)
         if result.rowcount == 0:
@@ -120,7 +116,7 @@ class ParticipantRepository(BaseRepository):
             TripParticipant.user_id == user_id, TripParticipant.trip_id == trip_id
         )
         result = await self._execute_read(query)
-        if not result:
+        if result is None:
             raise ParticipantNotFoundError(
                 participant_id=user_id, trip_id=trip_id)
         return result.scalar_one_or_none()
@@ -131,7 +127,7 @@ class ParticipantRepository(BaseRepository):
         query = select(TripParticipant).where(
             TripParticipant.trip_id == trip_id)
         result = await self._execute_read(query)
-        if not result:
+        if result is None:
             raise AllParticipantFromTripError(
                 "Unable to retrieve all trip members")
         return result.scalars().all()
@@ -186,7 +182,7 @@ class ExpenseRepository(BaseRepository):
     ) -> Expense | None:
         query = select(Expense).where(Expense.id == expense_id)
         result = await self._execute_read(query)
-        if not result:
+        if result is None:
             raise ExpenseNotFoundError(str(expense_id))
         return result.scalar_one_or_none()
 
@@ -195,14 +191,14 @@ class ExpenseRepository(BaseRepository):
     ) -> list[Expense] | None:
         query = select(Expense).where(Expense.trip_id == trip_id)
         result = await self._execute_read(query)
-        if not result:
+        if result is None:
             raise ExpenseNotFoundError(str(trip_id))
         return result.scalars().all()
 
     async def remove_trip_expense(self, expense_id: uuid.UUID) -> bool:
         query = delete(Expense).where(Expense.id == expense_id)
         result = await self._execute_write(query)
-        if not result:
+        if result is None:
             raise ExpenseNotFoundError(str(expense_id))
         return result.rowcount > 0
 
