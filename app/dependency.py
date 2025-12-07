@@ -58,7 +58,6 @@ def get_user_service(db_session: AsyncSession = Depends(get_db_session)) -> User
     return UserService(db_session)
 
 
-# TODO: убрать async в предыдущем уроке
 def get_auth_service(
     user_service: UserService = Depends(get_user_service),
 ) -> AuthService:
@@ -78,7 +77,8 @@ async def get_user_id(
 def get_permission_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
     expense_repo: ExpenseRepository = Depends(get_expense_repository),
-    participant_repo: ParticipantRepository = Depends(get_participant_repository),
+    participant_repo: ParticipantRepository = Depends(
+        get_participant_repository),
 ) -> PermissionService:
     return PermissionService(
         trip_repo=trip_repo,
@@ -89,7 +89,8 @@ def get_permission_service(
 
 def get_trip_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
-    participant_repo: ParticipantRepository = Depends(get_participant_repository),
+    participant_repo: ParticipantRepository = Depends(
+        get_participant_repository),
     permission_service: PermissionService = Depends(get_permission_service),
 ) -> TripService:
     return TripService(
@@ -101,7 +102,8 @@ def get_trip_service(
 
 def get_participant_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
-    participant_repo: ParticipantRepository = Depends(get_participant_repository),
+    participant_repo: ParticipantRepository = Depends(
+        get_participant_repository),
     permission_service: PermissionService = Depends(get_permission_service),
 ) -> ParticipantService:
     return ParticipantService(
