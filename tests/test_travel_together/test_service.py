@@ -145,7 +145,6 @@ async def test_update_trip__success(trip_service, mock_trip_repo, mock_permissio
 
     # Проверяем, что organizer_id не изменился
     update_call_args = mock_trip_repo.update_trip.call_args[0][1]
-    print(f" 123123 {update_call_args}")
     assert update_call_args["organizer_id"] == user.id
 
 

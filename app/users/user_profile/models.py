@@ -38,7 +38,8 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(back_populates="payer")
-    expense_shares: Mapped[list["ExpenseShare"]] = relationship(back_populates="user")
+    expense_shares: Mapped[list["ExpenseShare"]
+                           ] = relationship(back_populates="user")
     reviews_given: Mapped[list["Review"]] = relationship(
         foreign_keys="Review.reviewer_id", back_populates="reviewer"
     )
