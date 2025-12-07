@@ -53,7 +53,8 @@ class TripService:
         if not await self.permission_service.check_is_user_trip_organizer(
             user_id, trip_id
         ):
-            raise TripOrganizerRequiredError("Only the organizer can update this trip.")
+            raise TripOrganizerRequiredError(
+                "Only the organizer can update this trip.")
 
         trip_data = trip.model_dump()
         trip_data["organizer_id"] = existing_trip.organizer_id
@@ -65,7 +66,8 @@ class TripService:
         if not await self.permission_service.check_is_user_trip_organizer(
             user_id, trip_id
         ):
-            raise TripOrganizerRequiredError("Only the organizer can delete this trip.")
+            raise TripOrganizerRequiredError(
+                "Only the organizer can delete this trip.")
 
         await self.trip_repo.delete_trip(trip_id)
 

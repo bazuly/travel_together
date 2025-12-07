@@ -1,0 +1,36 @@
+services:
+  db-test:
+    image: postgres:15-alpine
+    env_file: ../.env.test
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d testdb"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+   
+  tests:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file: ../.env.test
+    command: .venv/bin/pytest -v tests/
+    environment:
+      - DB_DRIVER=postgresql+asyncpg
+      - DB_HOST=db-test
+      - DB_PORT=5432
+      - DB_USER=testuser
+      - DB_PASSWORD=testpass
+      - DB_NAME=testdb
+      - POSTGRES_PASSWORD=testpass
+      - JWT_SECRET_KEY=test-secret-key-for-testing-only
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    depends_on:
+      db-test:
+        condition: service_healthy

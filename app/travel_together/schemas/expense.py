@@ -1,11 +1,9 @@
 from datetime import datetime
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.travel_together.models import ExpenseCategory
-
-# TODO переделать эти схемы в предыдущих урока
 
 
 class ExpenseCreate(BaseModel):
@@ -15,12 +13,10 @@ class ExpenseCreate(BaseModel):
     category: ExpenseCategory
 
 
-# TODO переделать айдишники на интовые
 class ExpenseResponse(ExpenseCreate):
     id: uuid.UUID
     created_at: datetime
     payer_id: uuid.UUID
     trip_id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -26,7 +26,6 @@ class Trip(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid4
     )
-    # TODO обновил модель, обновить в предыдущих уроках
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str | None] = mapped_column(Text)
     destination: Mapped[str] = mapped_column(String(255))
@@ -35,7 +34,8 @@ class Trip(Base):
     budget_per_person: Mapped[float | None] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String(3), default="USD")
     is_public: Mapped[bool] = mapped_column(default=True)
-    created_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
+    created_at: Mapped[dt] = mapped_column(
+        DateTime(timezone=True), default=dt.utcnow)
     organizer_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=True
     )
