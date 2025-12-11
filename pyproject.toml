@@ -15,6 +15,7 @@ dependencies = [
     "httpx>=0.28.1",
     "jose>=1.0.0",
     "jwt>=1.4.0",
+    "make>=0.1.6.post2",
     "pydantic-settings>=2.11.0",
     "pydantic[email]>=2.11.9",
     "pytest>=9.0.1",
@@ -24,3 +25,13 @@ dependencies = [
     "sqlalchemy>=2.0.44",
     "uvicorn>=0.38.0",
 ]
+
+# настройки для докера
+# TODO: добавить описание в уроке как и что и зачем работает
+[tool.setuptools.packages.find]
+# Искать пакеты в текущей директории
+where = ["."]
+# Включить только пакет 'app'
+include = ["app*"]
+# Исключить папку Alembic из обнаружения пакетов
+exclude = ["alembic*"]
