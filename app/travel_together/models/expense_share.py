@@ -1,18 +1,20 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING  # pep-563
 
 if TYPE_CHECKING:
-    from .expense import Expense
     from app.users.user_profile.models import User
+
+    from .expense import Expense
 
 import uuid
 
-from sqlalchemy import ForeignKey, Float
+from sqlalchemy import Float, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.users.user_profile.models import User
 from app.infra.database.database import Base
+from app.users.user_profile.models import User
 
 
 class ExpenseShare(Base):

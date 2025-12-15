@@ -6,9 +6,9 @@ from app.travel_together.models import TripParticipant
 
 class PermissionService:
     from app.travel_together.repository import (
-        TripRepository,
         ExpenseRepository,
         ParticipantRepository,
+        TripRepository,
     )
 
     def __init__(

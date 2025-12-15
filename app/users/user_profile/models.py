@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 import uuid
 from uuid import uuid4
 
-from sqlalchemy import String, Boolean
+from sqlalchemy import Boolean, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -38,8 +39,7 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     expenses: Mapped[list["Expense"]] = relationship(back_populates="payer")
-    expense_shares: Mapped[list["ExpenseShare"]
-                           ] = relationship(back_populates="user")
+    expense_shares: Mapped[list["ExpenseShare"]] = relationship(back_populates="user")
     reviews_given: Mapped[list["Review"]] = relationship(
         foreign_keys="Review.reviewer_id", back_populates="reviewer"
     )

@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, status
 from typing import Annotated
 
-from app.users.auth import UserLoginSchema
-from app.users.user_profile import UserCreateSchema
-from app.dependency import get_auth_service
+from fastapi import APIRouter, Depends, status
 
+from app.dependency import get_auth_service
+from app.users.auth import UserLoginSchema
 from app.users.auth.service import AuthService
+from app.users.user_profile import UserCreateSchema
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

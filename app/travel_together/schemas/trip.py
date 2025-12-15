@@ -1,8 +1,8 @@
 import uuid
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime
 
 
 class TripCreate(BaseModel):
@@ -18,7 +18,8 @@ class TripCreate(BaseModel):
 
 class TripResponse(TripCreate):
     id: uuid.UUID = ConfigDict(
-        json_schema_serialization_defaults_required={"type": "string"})
+        json_schema_serialization_defaults_required={"type": "string"}
+    )
     organizer_id: uuid.UUID
     created_at: datetime
 
