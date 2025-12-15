@@ -1,13 +1,14 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from users.user_profile import User
 
-from datetime import datetime as dt
 import uuid
+from datetime import datetime as dt
 
-from sqlalchemy import Text, Integer, ForeignKey, DateTime
+from sqlalchemy import DateTime, ForeignKey, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

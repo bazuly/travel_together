@@ -1,9 +1,8 @@
+import uuid
 from datetime import datetime
 from typing import List
-import uuid
 
 from pydantic import BaseModel
-
 from travel_together.models import ExpenseCategory
 
 
