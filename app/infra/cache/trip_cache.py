@@ -12,14 +12,10 @@ class TripCache:
         self.redis = redis
 
     async def set_trip_cache(self, trip: TripResponse, trip_id: uuid.UUID):
-        # Используем trip_id для уникального ключа
         cache_key = f"trip:{trip_id}"
-
-        # 1. Сериализуем один объект в JSON-строку. Используем .model_dump() для Pydantic v2
         trip_json = trip.model_dump_json()
 
-        # 2. Кэшируем строку, например, с помощью SET
-        await self.redis.set(cache_key, trip_json)
+        await self.redis.set(cache_key, trip_json, ex=3600)
 
     async def get_trip_from_cache(
         self, trip_id: uuid.UUID
