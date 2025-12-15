@@ -1,12 +1,11 @@
 import uuid
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 
 from app.base_repository import BaseRepository
 from app.exceptions import UserNotFoundError
-
 from app.users.user_profile.models import User
-from app.users.user_profile.schemas import UserUpdateSchema, UserCreateSchema
+from app.users.user_profile.schemas import UserCreateSchema, UserUpdateSchema
 
 
 class UserRepository(BaseRepository):

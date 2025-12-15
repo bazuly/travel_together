@@ -2,12 +2,12 @@ import uuid
 from datetime import datetime
 
 from factory.alchemy import SQLAlchemyModelFactory
-from factory.fuzzy import FuzzyText, FuzzyFloat, FuzzyChoice
-from sqlalchemy.ext.asyncio import AsyncSession
 from factory.declarations import (
     LazyFunction,
     Sequence,
 )
+from factory.fuzzy import FuzzyChoice, FuzzyFloat, FuzzyText
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.travel_together.models import Trip
 from app.users.user_profile import User
@@ -43,7 +43,6 @@ class BaseFactory(AsyncSQLAlchemyModelFactory):
 # лучшая практика будет вынести factory user и base factory
 # в отдельные модули
 class UserFactory(BaseFactory):
-
     class Meta:
         model = User
 
@@ -55,7 +54,6 @@ class UserFactory(BaseFactory):
 
 
 class TripFactory(BaseFactory):
-
     class Meta:
         model = Trip
 

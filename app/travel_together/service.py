@@ -1,25 +1,26 @@
 import uuid
 
-from app.travel_together.permissions import PermissionService
-from app.travel_together.models import ParticipantStatus
 from app.config import get_settings
 from app.exceptions import (
     AlreadyTripParticipant,
-    ExpensePayerRequiredError,
     ExpenseNotFoundError,
-    ReachedMaxParticipants,
-    TripOrganizerRequiredError,
-    TripNotFoundError,
-    UserNotFoundExceptionAuth,
+    ExpensePayerRequiredError,
     ParticipantNotFoundError,
+    ReachedMaxParticipants,
+    TripNotFoundError,
+    TripOrganizerRequiredError,
+    UserNotFoundExceptionAuth,
 )
-from .repository import TripRepository, ParticipantRepository, ExpenseRepository
+from app.travel_together.models import ParticipantStatus
+from app.travel_together.permissions import PermissionService
+
+from .repository import ExpenseRepository, ParticipantRepository, TripRepository
 from .schemas import (
+    ExpenseCreate,
+    ExpenseResponse,
+    ParticipantResponse,
     TripCreate,
     TripResponse,
-    ParticipantResponse,
-    ExpenseResponse,
-    ExpenseCreate,
 )
 
 
@@ -53,8 +54,7 @@ class TripService:
         if not await self.permission_service.check_is_user_trip_organizer(
             user_id, trip_id
         ):
-            raise TripOrganizerRequiredError(
-                "Only the organizer can update this trip.")
+            raise TripOrganizerRequiredError("Only the organizer can update this trip.")
 
         trip_data = trip.model_dump()
         trip_data["organizer_id"] = existing_trip.organizer_id
@@ -66,8 +66,7 @@ class TripService:
         if not await self.permission_service.check_is_user_trip_organizer(
             user_id, trip_id
         ):
-            raise TripOrganizerRequiredError(
-                "Only the organizer can delete this trip.")
+            raise TripOrganizerRequiredError("Only the organizer can delete this trip.")
 
         await self.trip_repo.delete_trip(trip_id)
 

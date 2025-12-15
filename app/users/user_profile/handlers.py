@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from app.dependency import get_user_service
 from app.users.user_profile import UserService
+
 from .schemas import UserCreateSchema, UserResponseSchema
 
 router = APIRouter(prefix="/users", tags=["users"])

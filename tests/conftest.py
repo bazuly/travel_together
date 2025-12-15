@@ -5,17 +5,16 @@ from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
 from jose import jwt
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-
-from app.main import app
 from app.config import get_settings
 from app.infra.database import Base, get_db_session
-from app.travel_together.service import TripService
+from app.main import app
 from app.travel_together.schemas import TripCreate
+from app.travel_together.service import TripService
 from tests.factory import TripFactory, UserFactory
 
 TEST_DATABASE_URL = os.getenv(
@@ -48,7 +47,9 @@ async def db_session():
 @pytest_asyncio.fixture
 async def async_client():
     from httpx import AsyncClient
+
     from app.main import app
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         app.dependency_overrides = {}
         yield client
@@ -57,7 +58,7 @@ async def async_client():
 
 @pytest.fixture(autouse=True)
 def override_settings(monkeypatch):
-    """ Переопределяем наши сеттинги на тестовые """
+    """Переопределяем наши сеттинги на тестовые"""
 
     monkeypatch.setenv("DB_DRIVER", "postgresql+asyncpg")
     monkeypatch.setenv("DB_HOST", "db-test")
@@ -85,8 +86,7 @@ def generate_test_token(user_id: uuid.UUID) -> str:
     """Helper функция для генерации тестового токена"""
 
     settings = get_settings()
-    expires_data_unix = (datetime.now(timezone.utc) +
-                         timedelta(days=1)).timestamp()
+    expires_data_unix = (datetime.now(timezone.utc) + timedelta(days=1)).timestamp()
     if isinstance(user_id, uuid.UUID):
         user_id = user_id.hex
     token = jwt.encode(
@@ -106,7 +106,7 @@ def setup_factories(db_session: AsyncSession):
 
 @pytest_asyncio.fixture
 async def test_user():
-    """ Фикстура с тестовым пользователем """
+    """Фикстура с тестовым пользователем"""
 
     user = await UserFactory.create()
     return user
@@ -114,7 +114,7 @@ async def test_user():
 
 @pytest_asyncio.fixture
 async def test_data(test_user):
-    """ Фикстура с тестовыми данными """
+    """Фикстура с тестовыми данными"""
 
     # """Build an instance of the associated class, with overridden attrs.
     # проваливаемся в build и смотрим, что метод build принимает *kwargs,
@@ -173,7 +173,9 @@ async def client_with_db(db_session):
 
     app.dependency_overrides[get_db_session] = override_get_db_session
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://tests") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://tests"
+    ) as client:
         yield client
 
     # Очищаем переопределения

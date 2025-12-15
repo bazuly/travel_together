@@ -1,22 +1,22 @@
 import uuid
 
 from fastapi import Depends, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infra.database.accessor import get_db_session
-from app.users.auth.service import AuthService
-from app.users.user_profile.service import UserService
-from app.travel_together.service import TripService, ParticipantService, ExpenseService
 from app.travel_together.permissions import PermissionService
 from app.travel_together.repository import (
     ExpenseRepository,
-    UserRepository,
     ParticipantRepository,
     TripRepository,
+    UserRepository,
 )
-from .config import get_settings
+from app.travel_together.service import ExpenseService, ParticipantService, TripService
+from app.users.auth.service import AuthService
+from app.users.user_profile.service import UserService
 
+from .config import get_settings
 
 settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=True)
@@ -77,8 +77,7 @@ async def get_user_id(
 def get_permission_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
     expense_repo: ExpenseRepository = Depends(get_expense_repository),
-    participant_repo: ParticipantRepository = Depends(
-        get_participant_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
 ) -> PermissionService:
     return PermissionService(
         trip_repo=trip_repo,
@@ -89,8 +88,7 @@ def get_permission_service(
 
 def get_trip_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
-    participant_repo: ParticipantRepository = Depends(
-        get_participant_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
     permission_service: PermissionService = Depends(get_permission_service),
 ) -> TripService:
     return TripService(
@@ -102,8 +100,7 @@ def get_trip_service(
 
 def get_participant_service(
     trip_repo: TripRepository = Depends(get_trip_repository),
-    participant_repo: ParticipantRepository = Depends(
-        get_participant_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
     permission_service: PermissionService = Depends(get_permission_service),
 ) -> ParticipantService:
     return ParticipantService(

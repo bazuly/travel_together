@@ -2,8 +2,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .repository import UserRepository
 from .models import User
+from .repository import UserRepository
 from .schemas import UserCreateSchema, UserResponseSchema
 
 

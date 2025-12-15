@@ -1,11 +1,11 @@
-import pytest
 from unittest.mock import MagicMock
 from uuid import uuid4
 
+import pytest
 
-from app.travel_together.schemas import TripResponse
-from app.travel_together.models import Trip
 from app.exceptions import TripNotFoundError, TripOrganizerRequiredError
+from app.travel_together.models import Trip
+from app.travel_together.schemas import TripResponse
 
 # =============================================================================
 # CREATE TRIP TESTS
@@ -46,6 +46,7 @@ async def test_create_trip__success(trip_service, mock_trip_repo, test_data):
 # =============================================================================
 # RETRIEVE TRIP TESTS
 # =============================================================================
+
 
 @pytest.mark.asyncio
 async def test_retrieve_trip__success(trip_service, mock_trip_repo, test_data):
@@ -95,8 +96,11 @@ async def test_retrieve_trip__not_found(trip_service, mock_trip_repo):
 # UPDATE TRIP TESTS
 # =============================================================================
 
+
 @pytest.mark.asyncio
-async def test_update_trip__success(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_update_trip__success(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Тест успешного обновления поездки организатором"""
 
     user = test_data["user"]
@@ -140,7 +144,8 @@ async def test_update_trip__success(trip_service, mock_trip_repo, mock_permissio
 
     mock_trip_repo.retrieve_trip.assert_called_once_with(trip_id)
     mock_permission_service.check_is_user_trip_organizer.assert_called_once_with(
-        user.id, trip_id)
+        user.id, trip_id
+    )
     mock_trip_repo.update_trip.assert_called_once()
 
     # Проверяем, что organizer_id не изменился
@@ -149,7 +154,9 @@ async def test_update_trip__success(trip_service, mock_trip_repo, mock_permissio
 
 
 @pytest.mark.asyncio
-async def test_update_trip__not_organizer(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_update_trip__not_organizer(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Тест обновления поездки не организатором"""
 
     user = test_data["user"]
@@ -173,11 +180,14 @@ async def test_update_trip__not_organizer(trip_service, mock_trip_repo, mock_per
     mock_trip_repo.update_trip.assert_not_called()
     mock_trip_repo.retrieve_trip.assert_called_once_with(trip_id)
     mock_permission_service.check_is_user_trip_organizer.assert_called_once_with(
-        other_user_id, trip_id)
+        other_user_id, trip_id
+    )
 
 
 @pytest.mark.asyncio
-async def test_update_trip__trip_not_found(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_update_trip__trip_not_found(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Тест обновления несуществующей поездки"""
 
     user = test_data["user"]
@@ -197,8 +207,11 @@ async def test_update_trip__trip_not_found(trip_service, mock_trip_repo, mock_pe
 # DELETE TRIP TESTS
 # =============================================================================
 
+
 @pytest.mark.asyncio
-async def test_delete_trip__success(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_delete_trip__success(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Тест успешного удаления поездки организатором"""
     user = test_data["user"]
     trip_id = uuid4()
@@ -215,12 +228,15 @@ async def test_delete_trip__success(trip_service, mock_trip_repo, mock_permissio
 
     # Проверяем, что методы были вызваны правильно
     mock_permission_service.check_is_user_trip_organizer.assert_called_once_with(
-        user.id, trip_id)
+        user.id, trip_id
+    )
     mock_trip_repo.delete_trip.assert_called_once_with(trip_id)
 
 
 @pytest.mark.asyncio
-async def test_delete_trip__not_organizer(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_delete_trip__not_organizer(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Тест удаления поездки неорганизатором"""
 
     other_user_id = uuid4()
@@ -235,11 +251,14 @@ async def test_delete_trip__not_organizer(trip_service, mock_trip_repo, mock_per
 
     mock_trip_repo.delete_trip.assert_not_called()
     mock_permission_service.check_is_user_trip_organizer.assert_called_once_with(
-        other_user_id, trip_id)
+        other_user_id, trip_id
+    )
 
 
 @pytest.mark.asyncio
-async def test_delete_trip__trip_not_found(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_delete_trip__trip_not_found(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Тест удаления несуществующей поездки"""
 
     user = test_data["user"]
@@ -252,7 +271,8 @@ async def test_delete_trip__trip_not_found(trip_service, mock_trip_repo, mock_pe
         await trip_service.delete_trip(trip_id, user.id)
 
     mock_permission_service.check_is_user_trip_organizer.assert_called_once_with(
-        user.id, trip_id)
+        user.id, trip_id
+    )
     mock_trip_repo.delete_trip.assert_called_once_with(trip_id)
 
 
@@ -260,8 +280,11 @@ async def test_delete_trip__trip_not_found(trip_service, mock_trip_repo, mock_pe
 # INTEGRATION TESTS (с реальными зависимостями, но изолированными)
 # =============================================================================
 
+
 @pytest.mark.asyncio
-async def test_create_retrieve_update_delete_flow(trip_service, mock_trip_repo, mock_permission_service, test_data):
+async def test_create_retrieve_update_delete_flow(
+    trip_service, mock_trip_repo, mock_permission_service, test_data
+):
     """Интеграционный тест: создание -> получение -> обновление -> удаление"""
 
     user = test_data["user"]
