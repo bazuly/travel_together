@@ -1,5 +1,6 @@
 from uuid import UUID
-from pydantic import BaseModel, EmailStr, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserCreateSchema(BaseModel):
@@ -19,5 +20,4 @@ class UserResponseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserUpdateSchema(UserCreateSchema):
-    ...
+class UserUpdateSchema(UserCreateSchema): ...

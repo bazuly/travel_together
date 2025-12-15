@@ -1,25 +1,27 @@
 import uuid
 
-from app.travel_together.permissions import PermissionService
-from app.travel_together.models import ParticipantStatus
 from app.config import get_settings
 from app.exceptions import (
     AlreadyTripParticipant,
-    ExpensePayerRequiredError,
     ExpenseNotFoundError,
-    ReachedMaxParticipants,
-    TripOrganizerRequiredError,
-    TripNotFoundError,
-    UserNotFoundExceptionAuth,
+    ExpensePayerRequiredError,
     ParticipantNotFoundError,
+    ReachedMaxParticipants,
+    TripNotFoundError,
+    TripOrganizerRequiredError,
+    UserNotFoundExceptionAuth,
 )
-from .repository import TripRepository, ParticipantRepository, ExpenseRepository
+from app.infra.cache.trip_cache import TripCache
+from app.travel_together.models import ParticipantStatus
+from app.travel_together.permissions import PermissionService
+
+from .repository import ExpenseRepository, ParticipantRepository, TripRepository
 from .schemas import (
+    ExpenseCreate,
+    ExpenseResponse,
+    ParticipantResponse,
     TripCreate,
     TripResponse,
-    ParticipantResponse,
-    ExpenseResponse,
-    ExpenseCreate,
 )
 
 
@@ -29,8 +31,10 @@ class TripService:
         trip_repo: TripRepository,
         participant_repo: ParticipantRepository,
         permission_service: PermissionService,
+        trip_cache: TripCache,
     ):
         self.trip_repo = trip_repo
+        self.trip_cache = trip_cache
         self.participant_repo = participant_repo
         self.permission_service = permission_service
 
@@ -42,8 +46,13 @@ class TripService:
         return TripResponse.model_validate(trip)
 
     async def retrieve_trip(self, trip_id: uuid.UUID) -> TripResponse:
-        trip = await self.trip_repo.retrieve_trip(trip_id)
-        return TripResponse.model_validate(trip)
+        if cached_trip := await self.trip_cache.get_trip_from_cache(trip_id):
+            return cached_trip
+        else:
+            trip = await self.trip_repo.retrieve_trip(trip_id)
+            trip_schema = TripResponse.model_validate(trip)
+            await self.trip_cache.set_trip_cache(trip_schema, trip_id)
+            return trip_schema
 
     async def update_trip(
         self, trip_id: uuid.UUID, trip: TripCreate, user_id: uuid.UUID
@@ -53,8 +62,7 @@ class TripService:
         if not await self.permission_service.check_is_user_trip_organizer(
             user_id, trip_id
         ):
-            raise TripOrganizerRequiredError(
-                "Only the organizer can update this trip.")
+            raise TripOrganizerRequiredError("Only the organizer can update this trip.")
 
         trip_data = trip.model_dump()
         trip_data["organizer_id"] = existing_trip.organizer_id
@@ -66,8 +74,7 @@ class TripService:
         if not await self.permission_service.check_is_user_trip_organizer(
             user_id, trip_id
         ):
-            raise TripOrganizerRequiredError(
-                "Only the organizer can delete this trip.")
+            raise TripOrganizerRequiredError("Only the organizer can delete this trip.")
 
         await self.trip_repo.delete_trip(trip_id)
 

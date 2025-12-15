@@ -1,18 +1,17 @@
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-import uuid
 
 from fastapi import HTTPException, status
 from fastapi.security import HTTPBearer
 from jose import jwt
 
 from app.config import Settings
-from app.exceptions import UserNotFoundExceptionAuth, UserIncorrectPasswordException
+from app.exceptions import UserIncorrectPasswordException, UserNotFoundExceptionAuth
 from app.users.auth import UserLoginSchema
 
-from ..user_profile.service import UserService
 from ..user_profile.models import User
-
+from ..user_profile.service import UserService
 
 bearer_scheme = HTTPBearer(auto_error=True)
 

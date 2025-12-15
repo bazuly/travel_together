@@ -1,25 +1,25 @@
 import uuid
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import func
 
-from app.travel_together.models import (
-    Trip,
-    TripParticipant,
-    ParticipantStatus,
-    Expense,
-)
-from app.users.user_profile import UserRepository
 from app.base_repository import BaseRepository
 from app.exceptions import (
-    TripNotFoundError,
-    ParticipantNotFoundError,
-    ParticipantNotActiveError,
-    ExpenseNotFoundError,
     AllParticipantFromTripError,
+    ExpenseNotFoundError,
+    ParticipantNotActiveError,
+    ParticipantNotFoundError,
+    TripNotFoundError,
 )
+from app.travel_together.models import (
+    Expense,
+    ParticipantStatus,
+    Trip,
+    TripParticipant,
+)
+from app.users.user_profile import UserRepository
 
 
 class TripRepository(BaseRepository):
@@ -47,8 +47,7 @@ class TripRepository(BaseRepository):
 
     async def update_trip(self, trip_id: uuid.UUID, trip_data: dict) -> Trip:
         query = (
-            update(Trip).where(Trip.id == trip_id).values(
-                **trip_data).returning(Trip)
+            update(Trip).where(Trip.id == trip_id).values(**trip_data).returning(Trip)
         )
         result = await self._execute_write(query)
         trip_data = result.scalars().one_or_none()
@@ -79,7 +78,6 @@ class ParticipantRepository(BaseRepository):
         user_id: uuid.UUID,
         status=ParticipantStatus.PENDING,
     ) -> TripParticipant | None:
-
         user = await self.user_repo.get_user_by_id(user_id)
         if not user.is_active:
             raise ParticipantNotActiveError(str(user_id))
@@ -103,8 +101,7 @@ class ParticipantRepository(BaseRepository):
         )
         result = await self._execute_write(query)
         if result is None:
-            raise ParticipantNotFoundError(
-                participant_id=user_id, trip_id=trip_id)
+            raise ParticipantNotFoundError(participant_id=user_id, trip_id=trip_id)
         if result.rowcount == 0:
             raise ParticipantNotFoundError(str(user_id), str(trip_id))
         return result.rowcount > 0
@@ -117,19 +114,16 @@ class ParticipantRepository(BaseRepository):
         )
         result = await self._execute_read(query)
         if result is None:
-            raise ParticipantNotFoundError(
-                participant_id=user_id, trip_id=trip_id)
+            raise ParticipantNotFoundError(participant_id=user_id, trip_id=trip_id)
         return result.scalar_one_or_none()
 
     async def retrieve_all_participants_from_trip(
         self, trip_id: uuid.UUID
     ) -> list[TripParticipant]:
-        query = select(TripParticipant).where(
-            TripParticipant.trip_id == trip_id)
+        query = select(TripParticipant).where(TripParticipant.trip_id == trip_id)
         result = await self._execute_read(query)
         if result is None:
-            raise AllParticipantFromTripError(
-                "Unable to retrieve all trip members")
+            raise AllParticipantFromTripError("Unable to retrieve all trip members")
         return result.scalars().all()
 
     async def participants_count(self, trip_id: uuid.UUID) -> int:

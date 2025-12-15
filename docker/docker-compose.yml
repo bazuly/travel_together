@@ -21,6 +21,21 @@ services:
     volumes:
       - db_data:/var/lib/postgresql
 
+  cache:
+    image: redis:7.2.4-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
 volumes:
   db_data:
+    driver: local
+  cache_data:
     driver: local

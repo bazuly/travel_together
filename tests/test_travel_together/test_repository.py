@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions import TripNotFoundError
 from app.travel_together import TripRepository
 
-
 # # =============================================================================
 # CREATE TRIP TESTS
 # =============================================================================
@@ -60,6 +59,7 @@ async def test_create_trip__with_minimal_data(db_session: AsyncSession, test_use
 # =============================================================================
 # RETRIEVE TRIP TESTS
 # =============================================================================
+
 
 @pytest.mark.asyncio
 async def test_retrieve_trip__success(db_session: AsyncSession, test_data):
@@ -128,6 +128,7 @@ async def test_retrieve_trip_for_update__not_found(db_session: AsyncSession):
 # =============================================================================
 # UPDATE TRIP TESTS
 # =============================================================================
+
 
 @pytest.mark.asyncio
 async def test_update_trip__success(db_session: AsyncSession, test_data):
@@ -199,6 +200,7 @@ async def test_update_trip__not_found(db_session: AsyncSession):
 # DELETE TRIP TESTS
 # =============================================================================
 
+
 @pytest.mark.asyncio
 async def test_delete_trip__success(db_session: AsyncSession, test_data):
     """Тест успешного удаления поездки"""
@@ -233,6 +235,7 @@ async def test_delete_trip__not_found(db_session: AsyncSession):
 # =============================================================================
 # INTEGRATION TESTS
 # =============================================================================
+
 
 @pytest.mark.asyncio
 async def test_create_retrieve_update_delete_flow(db_session: AsyncSession, test_data):

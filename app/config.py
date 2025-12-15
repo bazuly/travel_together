@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
+    # redis cache settings
+    CACHE_HOST: str
+    CACHE_PORT: int
+    CACHE_DB: int
+    REDIS_URL: str
+
     # trip app settings
     MAX_PARTICIPANTS: int = 10
 
