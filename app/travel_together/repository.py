@@ -1,10 +1,10 @@
 import uuid
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 
-from app.travel_together.models import Trip
 from app.base_repository import BaseRepository
 from app.exceptions import TripNotFoundError
+from app.travel_together.models import Trip
 
 
 class TripRepository(BaseRepository):
@@ -31,8 +31,7 @@ class TripRepository(BaseRepository):
         return trip_data
 
     async def update_trip(self, trip_id: uuid.UUID, trip: dict) -> Trip:
-        query = update(Trip).where(
-            Trip.id == trip_id).values(**trip).returning(Trip)
+        query = update(Trip).where(Trip.id == trip_id).values(**trip).returning(Trip)
         result = await self._execute_write(query)
         trip_data = result.scalars().one_or_none()
         if trip_data is None:

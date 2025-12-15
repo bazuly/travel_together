@@ -1,13 +1,13 @@
 from fastapi import Depends, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infra.database.accessor import get_db_session
+from app.travel_together.service import TripService
 from app.users.auth.service import AuthService
 from app.users.user_profile.service import UserService
-from app.travel_together.service import TripService
-from .config import get_settings
 
+from .config import get_settings
 
 settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=True)

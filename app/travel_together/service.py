@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import TripOrganizerRequiredError
+
 from .repository import TripRepository
 from .schemas import TripCreate, TripResponse
 

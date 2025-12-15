@@ -1,17 +1,20 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .expense_share import ExpenseShare
-    from .trip import Trip
     from users.user_profile import User
 
+    from .expense_share import ExpenseShare
+    from .trip import Trip
 
+
+import uuid
 from datetime import datetime as dt
 from enum import Enum
-import uuid
 
-from sqlalchemy import Enum as SQLEnum, DateTime, String, Float, ForeignKey
+from sqlalchemy import DateTime, Float, ForeignKey, String
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
