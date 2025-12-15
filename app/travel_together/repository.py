@@ -1,23 +1,23 @@
 import uuid
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.sql.expression import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import func
 
-from app.travel_together.models import (
-    Trip,
-    TripParticipant,
-    ParticipantStatus,
-)
-from app.users.user_profile import UserRepository
 from app.base_repository import BaseRepository
 from app.exceptions import (
-    TripNotFoundError,
-    ParticipantNotFoundError,
-    ParticipantNotActiveError,
     AllParticipantFromTripError,
+    ParticipantNotActiveError,
+    ParticipantNotFoundError,
+    TripNotFoundError,
 )
+from app.travel_together.models import (
+    ParticipantStatus,
+    Trip,
+    TripParticipant,
+)
+from app.users.user_profile import UserRepository
 
 
 class TripRepository(BaseRepository):
@@ -76,7 +76,6 @@ class ParticipantRepository(BaseRepository):
         user_id: uuid.UUID,
         status=ParticipantStatus.PENDING,
     ) -> TripParticipant | None:
-
         user = await self.user_repo.get_user_by_id(user_id)
         if not user.is_active:
             raise ParticipantNotActiveError(str(user_id))

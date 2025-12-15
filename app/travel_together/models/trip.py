@@ -1,18 +1,20 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .expense import Expense
-    from .review import Review
-    from .participant import TripParticipant
     from users.user_profile import User
 
+    from .expense import Expense
+    from .participant import TripParticipant
+    from .review import Review
 
-from datetime import datetime as dt
+
 import uuid
+from datetime import datetime as dt
 from uuid import uuid4
 
-from sqlalchemy import String, Text, DateTime, Float, ForeignKey
+from sqlalchemy import DateTime, Float, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
