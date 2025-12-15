@@ -1,10 +1,10 @@
 import uuid
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 
-from app.travel_together.models import Trip
 from app.base_repository import BaseRepository
 from app.exceptions import TripNotFoundError
+from app.travel_together.models import Trip
 
 
 class TripRepository(BaseRepository):

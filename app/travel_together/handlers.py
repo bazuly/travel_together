@@ -1,11 +1,10 @@
 from uuid import UUID
 
-from fastapi import Depends, APIRouter, status
+from fastapi import APIRouter, Depends, status
 
 from app.dependency import get_trip_service
-from app.travel_together.service import TripService
 from app.travel_together.schemas import TripCreate, TripResponse
-
+from app.travel_together.service import TripService
 
 router = APIRouter(
     prefix="/trip",
