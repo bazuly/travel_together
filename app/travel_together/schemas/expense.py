@@ -1,11 +1,9 @@
-from datetime import datetime
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel
 
 from app.travel_together.models import ExpenseCategory
-
-# TODO переделать эти схемы в предыдущих урока
 
 
 class ExpenseCreate(BaseModel):
@@ -15,7 +13,6 @@ class ExpenseCreate(BaseModel):
     category: ExpenseCategory
 
 
-# TODO переделать айдишники на интовые
 class ExpenseResponse(ExpenseCreate):
     id: uuid.UUID
     created_at: datetime

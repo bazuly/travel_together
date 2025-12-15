@@ -1,22 +1,22 @@
 import uuid
 
 from fastapi import Depends, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infra.database.accessor import get_db_session
-from app.users.auth.service import AuthService
-from app.users.user_profile.service import UserService
-from app.travel_together.service import TripService, ParticipantService, ExpenseService
 from app.travel_together.permissions import PermissionService
 from app.travel_together.repository import (
     ExpenseRepository,
-    UserRepository,
     ParticipantRepository,
     TripRepository,
+    UserRepository,
 )
-from .config import get_settings
+from app.travel_together.service import ExpenseService, ParticipantService, TripService
+from app.users.auth.service import AuthService
+from app.users.user_profile.service import UserService
 
+from .config import get_settings
 
 settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=True)
