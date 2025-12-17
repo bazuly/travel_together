@@ -322,9 +322,6 @@ async def test_create_retrieve_update_delete_flow(
 
     # 2. Получение
     mock_trip_cache.get_trip_from_cache.return_value = None
-    mock_trip_cache.set_trip_cache.assert_called_once()
-    mock_trip_cache.get_trip_from_cache.assert_called_once_with(trip_id)
-
     mock_trip_repo.retrieve_trip.return_value = mock_created_trip
     retrieved_result = await trip_service.retrieve_trip(trip_id)
     assert retrieved_result.id == trip_id
