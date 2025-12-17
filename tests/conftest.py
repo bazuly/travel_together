@@ -71,6 +71,11 @@ def override_settings(monkeypatch):
     monkeypatch.setenv("ALGORITHM", "HS256")
     monkeypatch.setenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 
+    monkeypatch.setenv("CACHE_PORT", "6378")
+    monkeypatch.setenv("CACHE_DB", "0")
+    monkeypatch.setenv("CACHE_HOST", "cache")
+    monkeypatch.setenv("REDIS_URL", "redis://cache:6379/0")
+
     from app.config import get_settings
 
     settings = get_settings()
@@ -80,8 +85,6 @@ def override_settings(monkeypatch):
     settings.model_rebuild()
 
 
-# мы конечно нарушаем DRY
-# но для тестов проще переопределить метод прямо в тесте
 def generate_test_token(user_id: uuid.UUID) -> str:
     """Helper функция для генерации тестового токена"""
 
@@ -204,11 +207,19 @@ async def mock_permission_service():
 
 
 @pytest_asyncio.fixture
-async def trip_service(mock_trip_repo, mock_participant_repo, mock_permission_service):
+async def mock_trip_cache():
+    return AsyncMock()
+
+
+@pytest_asyncio.fixture
+async def trip_service(
+    mock_trip_repo, mock_participant_repo, mock_permission_service, mock_trip_cache
+):
     """Фикстура для создания TripService с моками"""
 
     return TripService(
         trip_repo=mock_trip_repo,
         participant_repo=mock_participant_repo,
         permission_service=mock_permission_service,
+        trip_cache=mock_trip_cache,
     )

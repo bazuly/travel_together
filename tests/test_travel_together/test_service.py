@@ -49,7 +49,9 @@ async def test_create_trip__success(trip_service, mock_trip_repo, test_data):
 
 
 @pytest.mark.asyncio
-async def test_retrieve_trip__success(trip_service, mock_trip_repo, test_data):
+async def test_retrieve_trip__success(
+    trip_service, mock_trip_repo, test_data, mock_trip_cache
+):
     """Тест успешного получения поездки через сервис"""
     trip_id = uuid4()
     user = test_data["user"]
@@ -67,6 +69,7 @@ async def test_retrieve_trip__success(trip_service, mock_trip_repo, test_data):
     mock_trip.is_public = True
     mock_trip.created_at = test_data["trip_schema"].start_date
 
+    mock_trip_cache.get_trip_from_cache.return_value = None
     mock_trip_repo.retrieve_trip.return_value = mock_trip
 
     result = await trip_service.retrieve_trip(trip_id)
@@ -76,20 +79,25 @@ async def test_retrieve_trip__success(trip_service, mock_trip_repo, test_data):
     assert result.title == "Test Trip"
 
     mock_trip_repo.retrieve_trip.assert_called_once_with(trip_id)
+    mock_trip_cache.get_trip_from_cache.assert_called_once_with(trip_id)
+    mock_trip_cache.set_trip_cache.assert_called_once()
 
 
 @pytest.mark.asyncio
-async def test_retrieve_trip__not_found(trip_service, mock_trip_repo):
+async def test_retrieve_trip__not_found(trip_service, mock_trip_repo, mock_trip_cache):
     """Тест получения несуществующей поездки через сервис"""
     trip_id = uuid4()
 
+    mock_trip_cache.get_trip_from_cache.return_value = None
     mock_trip_repo.retrieve_trip.side_effect = TripNotFoundError(trip_id)
 
     with pytest.raises(TripNotFoundError) as exc_info:
         await trip_service.retrieve_trip(trip_id)
 
     assert str(trip_id) in str(exc_info.value)
+    mock_trip_cache.get_trip_from_cache.assert_called_once_with(trip_id)
     mock_trip_repo.retrieve_trip.assert_called_once_with(trip_id)
+    mock_trip_cache.set_trip_cache.assert_not_called()
 
 
 # =============================================================================
@@ -186,7 +194,10 @@ async def test_update_trip__not_organizer(
 
 @pytest.mark.asyncio
 async def test_update_trip__trip_not_found(
-    trip_service, mock_trip_repo, mock_permission_service, test_data
+    trip_service,
+    mock_trip_repo,
+    mock_permission_service,
+    test_data,
 ):
     """Тест обновления несуществующей поездки"""
 
@@ -283,7 +294,7 @@ async def test_delete_trip__trip_not_found(
 
 @pytest.mark.asyncio
 async def test_create_retrieve_update_delete_flow(
-    trip_service, mock_trip_repo, mock_permission_service, test_data
+    trip_service, mock_trip_repo, mock_permission_service, test_data, mock_trip_cache
 ):
     """Интеграционный тест: создание -> получение -> обновление -> удаление"""
 
@@ -310,6 +321,10 @@ async def test_create_retrieve_update_delete_flow(
     assert created_result.id == trip_id
 
     # 2. Получение
+    mock_trip_cache.get_trip_from_cache.return_value = None
+    mock_trip_cache.set_trip_cache.assert_called_once()
+    mock_trip_cache.get_trip_from_cache.assert_called_once_with(trip_id)
+
     mock_trip_repo.retrieve_trip.return_value = mock_created_trip
     retrieved_result = await trip_service.retrieve_trip(trip_id)
     assert retrieved_result.id == trip_id
