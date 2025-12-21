@@ -4,6 +4,7 @@ from fastapi import Depends, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.broker.producer import TripTaskProducer
 from app.infra.cache.accessor import get_redis_connection
 from app.infra.cache.trip_cache import TripCache
 from app.infra.database.accessor import get_db_session
@@ -33,6 +34,10 @@ def get_user_repository(
 def get_trip_cache() -> TripCache:
     db_redis_session = get_redis_connection()
     return TripCache(db_redis_session)
+
+
+def get_trip_producer() -> TripTaskProducer:
+    return TripTaskProducer()
 
 
 def get_trip_repository(
@@ -98,12 +103,14 @@ def get_trip_service(
     trip_cache: TripCache = Depends(get_trip_cache),
     participant_repo: ParticipantRepository = Depends(get_participant_repository),
     permission_service: PermissionService = Depends(get_permission_service),
+    trip_producer: TripTaskProducer = Depends(get_trip_producer),
 ) -> TripService:
     return TripService(
         trip_repo=trip_repo,
         participant_repo=participant_repo,
         permission_service=permission_service,
         trip_cache=trip_cache,
+        trip_producer=trip_producer,
     )
 
 

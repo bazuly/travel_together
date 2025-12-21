@@ -7,6 +7,9 @@ services:
       - ../.env.test
     ports:
       - "8000:8000"
+    working_dir: /app
+    volumes:
+      - ./media:/app/media
     depends_on:
       db:
         condition: service_started
@@ -33,6 +36,34 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:4.2-management-alpine"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    hostname: rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  pdf-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: ["uv", "run", "python", "-m", "app.worker.consumer"]
+    env_file: ../.env
+    working_dir: /app
+    volumes:
+      - ./media:/app/media
+    depends_on:
+      rabbitmq: { condition: service_healthy }
+      db: { condition: service_started }
+
 
 volumes:
   db_data:

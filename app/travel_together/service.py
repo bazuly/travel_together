@@ -1,5 +1,6 @@
 import uuid
 
+from app.broker.producer import TripTaskProducer
 from app.config import get_settings
 from app.exceptions import (
     AlreadyTripParticipant,
@@ -32,18 +33,30 @@ class TripService:
         participant_repo: ParticipantRepository,
         permission_service: PermissionService,
         trip_cache: TripCache,
+        trip_producer: TripTaskProducer,
     ):
         self.trip_repo = trip_repo
         self.trip_cache = trip_cache
         self.participant_repo = participant_repo
         self.permission_service = permission_service
+        self.trip_producer = trip_producer
 
     async def create_trip(self, trip: TripCreate, user_id: uuid.UUID) -> TripResponse:
         trip_data = trip.model_dump()
         trip_data["organizer_id"] = user_id
         trip = await self.trip_repo.create_trip(trip_data)
 
-        return TripResponse.model_validate(trip)
+        trip_schema = TripResponse.model_validate(trip)
+
+        task_data = {
+            "trip_id": str(trip_schema.id),
+            "title": trip_schema.title,
+            "destination": trip_schema.destination,
+            "start_date": str(trip_schema.start_date),
+        }
+        await self.trip_producer.send_to_pdf_worker(task_data)
+
+        return trip_schema
 
     async def retrieve_trip(self, trip_id: uuid.UUID) -> TripResponse:
         if cached_trip := await self.trip_cache.get_trip_from_cache(trip_id):

@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +26,15 @@ class Settings(BaseSettings):
 
     # trip app settings
     MAX_PARTICIPANTS: int = 10
+
+    BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    MEDIA_ROOT: str = os.path.join(BASE_DIR, "media")
+    PDF_DIR: str = os.path.join(MEDIA_ROOT, "pdfs")
+
+    # rabbitmq settings
+    RABBITMQ_URL: str
+    RABBIT_PORT: int
+    RABBIT_CONTROL_PANEL_PORT: int
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
