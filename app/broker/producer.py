@@ -18,9 +18,11 @@ class TripTaskProducer:
 
     async def send_to_pdf_worker(self, trip_data: dict):
         connection = await self.get_connection()
-        channel = await connection.channel()
 
-        async with connection:
+        async with connection.channel() as channel:
+            # объявляем очередь
+            # флаг durable означает, что очередь не потеряется
+            # если сервер упадет
             await channel.declare_queue("pdf_generation", durable=True)
 
             message_body = json.dumps(trip_data).encode()

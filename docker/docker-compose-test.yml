@@ -27,6 +27,20 @@ services:
       timeout: 3s
       retries: 5
 
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:4.2-management-alpine"
+    ports:
+      - "15672:15672"
+      - "5671:5672"
+    hostname: rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   tests:
     build:
       context: ..

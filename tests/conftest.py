@@ -58,7 +58,7 @@ async def async_client():
 
 @pytest.fixture(autouse=True)
 def override_settings(monkeypatch):
-    """Переопределяем наши сеттинги на тестовые"""
+    """Переопределяем наши настройки на тестовые"""
 
     monkeypatch.setenv("DB_DRIVER", "postgresql+asyncpg")
     monkeypatch.setenv("DB_HOST", "db-test")
@@ -75,6 +75,9 @@ def override_settings(monkeypatch):
     monkeypatch.setenv("CACHE_DB", "0")
     monkeypatch.setenv("CACHE_HOST", "cache")
     monkeypatch.setenv("REDIS_URL", "redis://cache:6379/0")
+
+    monkeypatch.setenv("RABBITMQ_URL", "amqp://guest:guest@rabbitmq:5672/")
+    monkeypatch.setenv("RABBIT_PORT", "5671")
 
     from app.config import get_settings
 
@@ -212,8 +215,17 @@ async def mock_trip_cache():
 
 
 @pytest_asyncio.fixture
+async def mock_trip_producer():
+    return AsyncMock()
+
+
+@pytest_asyncio.fixture
 async def trip_service(
-    mock_trip_repo, mock_participant_repo, mock_permission_service, mock_trip_cache
+    mock_trip_repo,
+    mock_participant_repo,
+    mock_permission_service,
+    mock_trip_cache,
+    mock_trip_producer,
 ):
     """Фикстура для создания TripService с моками"""
 
@@ -222,4 +234,5 @@ async def trip_service(
         participant_repo=mock_participant_repo,
         permission_service=mock_permission_service,
         trip_cache=mock_trip_cache,
+        trip_producer=mock_trip_producer,
     )

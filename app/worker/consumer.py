@@ -28,7 +28,7 @@ def generate_pdf(data):
     filepath = os.path.join(settings.PDF_DIR, filename)
     pdf.output(filepath)
 
-    # TODO: для сохранения в БД, если потребуется
+    # для сохранения в БД, если потребуется
     relative_path = os.path.join("trip_pdfs", filename)
     return relative_path
 
