@@ -45,10 +45,24 @@ async def db_session():
 
 
 @pytest_asyncio.fixture
+async def mock_trip_producer():
+    return AsyncMock()
+
+
+@pytest_asyncio.fixture
 async def async_client():
     from httpx import AsyncClient
 
     from app.main import app
+
+    # в тестах сервисов нам не нужно отправлять таски в настоящий RabbitMQ
+    # нам достаточно подменить продьюсер на пустышку
+    # в целом это самый простой и верный подход в UNIT-тестах
+    # поэтому тут прописываем замоканый продьюсер
+    # в противном случае в тестах будем получать ошибку RuntimeError: Event loop is closed
+    # т.к. pytest видит, что код теста закончился, и мгновенно закрывает Event Loop (цикл событий).
+    # Фоновая задача RabbitMQ просыпается через миллисекунду, пытается что-то сделать в цикле, но цикла уже нет.
+    app.state.mock_trip_producer = mock_trip_producer
 
     async with AsyncClient(app=app, base_url="http://test") as client:
         app.dependency_overrides = {}
@@ -211,11 +225,6 @@ async def mock_permission_service():
 
 @pytest_asyncio.fixture
 async def mock_trip_cache():
-    return AsyncMock()
-
-
-@pytest_asyncio.fixture
-async def mock_trip_producer():
     return AsyncMock()
 
 
