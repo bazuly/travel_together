@@ -129,7 +129,12 @@ def get_participant_service(
 def get_expense_service(
     expense_repo: ExpenseRepository = Depends(get_expense_repository),
     permission_service: PermissionService = Depends(get_permission_service),
+    trip_repo: TripRepository = Depends(get_trip_repository),
+    participant_repo: ParticipantRepository = Depends(get_participant_repository),
 ) -> ExpenseService:
     return ExpenseService(
-        expense_repo=expense_repo, permission_service=permission_service
+        expense_repo=expense_repo,
+        permission_service=permission_service,
+        trip_repo=trip_repo,
+        participant_repo=participant_repo,
     )

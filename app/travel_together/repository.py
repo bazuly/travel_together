@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import delete, insert, select, update
+from sqlalchemy import and_, delete, insert, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import func
@@ -210,3 +210,32 @@ class ExpenseRepository(BaseRepository):
         if expense_data is None:
             raise ExpenseNotFoundError(str(expense_id))
         return expense_data
+
+    async def get_complex_financial_report(
+        self, trip_id: uuid.UUID, user_id: uuid.UUID
+    ):
+        participants_subquery = (
+            select(func.count(TripParticipant.user_id))
+            .where(TripParticipant.trip_id == trip_id)
+            .scalar_subquery()
+        )
+
+        # траты конкретного пользователя
+        user_spent_subquery = (
+            select(func.coalesce(func.sum(Expense.amount), 0))
+            .where(and_(Expense.trip_id == trip_id, Expense.payer_id == user_id))
+            .scalar_subquery()  # Теперь вызываем у SELECT объекта
+        )
+        query = (
+            select(
+                Expense.category,
+                func.sum(Expense.amount).label("category_amount"),
+                func.sum(func.sum(Expense.amount)).over().label("total_trip_spent"),
+                participants_subquery.label("participants_count"),
+                user_spent_subquery.label("user_paid_total"),
+            )
+            .where(Expense.trip_id == trip_id)
+            .group_by(Expense.category)
+        )
+        result = await self._execute_read(query)
+        return result.all()

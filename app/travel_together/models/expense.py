@@ -38,7 +38,6 @@ class Expense(Base):
     currency: Mapped[str] = mapped_column(String(3), default="USD")
     category: Mapped[ExpenseCategory] = mapped_column(SQLEnum(ExpenseCategory))
     created_at: Mapped[dt] = mapped_column(DateTime(timezone=True), default=dt.utcnow)
-
     payer_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id")
     )

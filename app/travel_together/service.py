@@ -4,6 +4,7 @@ from app.broker.producer import TripTaskProducer
 from app.config import get_settings
 from app.exceptions import (
     AlreadyTripParticipant,
+    ErrorWhileCreateExpenseReport,
     ExpenseNotFoundError,
     ExpensePayerRequiredError,
     ParticipantNotFoundError,
@@ -22,6 +23,7 @@ from .schemas import (
     ExpenseResponse,
     ParticipantResponse,
     TripCreate,
+    TripFinancialReport,
     TripResponse,
 )
 
@@ -156,9 +158,13 @@ class ParticipantService:
 class ExpenseService:
     def __init__(
         self,
+        trip_repo: TripRepository,
         expense_repo: ExpenseRepository,
         permission_service: PermissionService,
+        participant_repo: ParticipantRepository,
     ):
+        self.participant_repo = participant_repo
+        self.trip_repo = trip_repo
         self.expense_repo = expense_repo
         self.permission_service = permission_service
 
@@ -233,3 +239,30 @@ class ExpenseService:
             raise ExpensePayerRequiredError(expense_id)
 
         return await self.expense_repo.remove_trip_expense(expense_id)
+
+    async def get_trip_expense_report(
+        self, user_id: uuid.UUID, trip_id: uuid.UUID
+    ) -> TripFinancialReport:
+        rows_data = await self.expense_repo.get_complex_financial_report(
+            trip_id=trip_id, user_id=user_id
+        )
+
+        if not rows_data:
+            raise ErrorWhileCreateExpenseReport()
+
+        first_row = rows_data[0]
+        total_trip_spent = first_row.total_trip_spent
+        total_participants = first_row.participants_count
+        user_paid_total = first_row.user_paid_total
+
+        per_person_share = (
+            total_trip_spent / total_participants if total_participants > 0 else 0
+        )
+        user_balance = user_paid_total - per_person_share
+
+        return TripFinancialReport(
+            trip_id=trip_id,
+            total_spent=total_trip_spent,
+            user_paid_total=user_paid_total,
+            user_balance=user_balance,
+        )

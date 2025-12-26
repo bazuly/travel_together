@@ -20,3 +20,15 @@ class ExpenseResponse(ExpenseCreate):
     trip_id: uuid.UUID
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CategorySummary(BaseModel):
+    category: str
+    amount: float
+
+
+class TripFinancialReport(BaseModel):
+    trip_id: uuid.UUID
+    total_spent: float
+    user_paid_total: float
+    user_balance: float

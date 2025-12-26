@@ -13,6 +13,7 @@ from app.travel_together.schemas import (
     ExpenseResponse,
     ParticipantResponse,
     TripCreate,
+    TripFinancialReport,
     TripResponse,
 )
 from app.travel_together.service import ExpenseService, ParticipantService, TripService
@@ -153,3 +154,18 @@ async def remove_trip_expense(
     expense_service: ExpenseService = Depends(get_expense_service),
 ) -> None:
     return await expense_service.remove_trip_expense(user_id, expense_id)
+
+
+@router.get(
+    "/get_trip_expense_report/{trip_id}",
+    response_model=TripFinancialReport,
+    status_code=status.HTTP_200_OK,
+)
+async def get_trip_expense_report(
+    trip_id: UUID,
+    user_id: UUID = Depends(get_user_id),
+    expense_service: ExpenseService = Depends(get_expense_service),
+) -> TripFinancialReport:
+    return await expense_service.get_trip_expense_report(
+        user_id=user_id, trip_id=trip_id
+    )

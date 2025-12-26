@@ -170,3 +170,9 @@ class ExpensePayerRequiredError(Exception):
         super().__init__(
             f"Only the expense creator can update or delete expense_data! Expense_id: {expense_id}"
         )
+
+
+class ErrorWhileCreateExpenseReport(Exception):
+    """Creation Expense Report Error"""
+
+    pass
