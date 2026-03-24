@@ -22,7 +22,7 @@ from app.infra.database import Base
 
 
 class Trip(Base):
-    __tablename__ = "trips"
+    __tablename__ = "trips"  # type: ignore
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid4

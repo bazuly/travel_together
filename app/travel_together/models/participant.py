@@ -27,7 +27,7 @@ class ParticipanStatus(str, Enum):
 
 
 class TripParticipan(Base):
-    __tablename__ = "trip_participans"
+    __tablename__ = "trip_participans" # type: ignore
 
     trip_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("trips.id"), primary_key=True

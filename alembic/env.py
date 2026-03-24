@@ -1,11 +1,11 @@
 import asyncio
 from logging.config import fileConfig
+
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
-
-from app.infra.database import Base
 from app.config import Settings
+from app.infra.database import Base
 
 # imported models
 from app.travel_together.models import *  # noqa

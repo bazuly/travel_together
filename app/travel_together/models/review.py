@@ -16,7 +16,7 @@ from app.infra.database import Base
 
 
 class Review(Base):
-    __tablename__ = "reviews"
+    __tablename__ = "reviews" # type: ignore
 
     id: Mapped[int] = mapped_column(primary_key=True)
     rating: Mapped[int] = mapped_column(Integer)
