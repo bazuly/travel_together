@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from turtle import back
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -27,7 +28,7 @@ class ParticipanStatus(str, Enum):
 
 
 class TripParticipan(Base):
-    __tablename__ = "trip_participans" # type: ignore
+    __tablename__ = "trip_participans"  # type: ignore
 
     trip_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("trips.id"), primary_key=True
