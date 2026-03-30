@@ -2,7 +2,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # DB settings
     POSTGRES_PASSWORD: str
     DB_DRIVER: str
     DB_HOST: str
@@ -19,4 +18,4 @@ class Settings(BaseSettings):
 
 
 def get_settings():
-    return Settings()
+    return Settings()  # type: ignore

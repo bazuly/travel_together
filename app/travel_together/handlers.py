@@ -50,5 +50,5 @@ async def update_trip(
 async def delete_trip(
     trip_id: UUID,
     trip_service: TripService = Depends(get_trip_service),
-) -> None:
+):
     return await trip_service.delete_trip(trip_id)

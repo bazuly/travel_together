@@ -18,8 +18,7 @@ class TripCreate(BaseModel):
 
 
 class TripResponse(TripCreate):
-    id: uuid.UUID = Field(..., json_schema_serialization_defaults={"type": "string"})
-    # TODO: remove optional later
+    id: uuid.UUID = Field(..., json_schema_serialization_defaults={"type": "string"})  # type: ignore
     organizer_id: Optional[uuid.UUID]
     created_at: datetime
 
