@@ -30,7 +30,7 @@ class ExpenseCategory(str, Enum):
 
 
 class Expense(Base):
-    __tablename__ = "expenses"  # type: ignore
+    __tablename__ = "expenses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(String(200))
