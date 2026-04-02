@@ -12,10 +12,12 @@ dependencies = [
     "httpx>=0.28.1",
     "jose>=1.0.0",
     "jwt>=1.4.0",
+    "passlib>=1.7.4",
     "pydantic-settings>=2.11.0",
     "pydantic[email]>=2.11.9",
     "python-jose>=3.5.0",
     "ruff>=0.14.2",
     "sqlalchemy>=2.0.44",
     "uvicorn>=0.38.0",
+    "bcrypt==4.0.1"
 ]

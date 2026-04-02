@@ -14,11 +14,11 @@ class TripCreate(BaseModel):
     budget_per_person: Optional[float] = None
     currency: str = "USD"
     is_public: bool = True
+    organizer_id: Optional[uuid.UUID] = None
 
 
 class TripResponse(TripCreate):
-    id: uuid.UUID = Field(..., json_schema_serialization_defaults={"type": "string"})
-    organizer_id: uuid.UUID
+    id: uuid.UUID = Field(..., json_schema_serialization_defaults={"type": "string"})  # type: ignore
     created_at: datetime
 
     class Config:

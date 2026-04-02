@@ -15,4 +15,4 @@ async def login(
     body: UserCreateSchema,
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ):
-    return await auth_service.login(email=body.email, password=body.password)
+    return await auth_service.login(username=body.username, password=body.password)

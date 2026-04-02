@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-from app.dependency import get_current_user_id, get_trip_service
+from app.dependency import get_trip_service
 from app.travel_together.schemas import TripCreate, TripResponse
 from app.travel_together.service import TripService
 
@@ -18,9 +18,8 @@ router = APIRouter(
 async def create_trip(
     trip: TripCreate,
     trip_service: TripService = Depends(get_trip_service),
-    current_user_id=Depends(get_current_user_id),
 ) -> TripResponse:
-    return await trip_service.create_trip(trip, current_user_id)
+    return await trip_service.create_trip(trip)
 
 
 @router.get(
@@ -43,15 +42,13 @@ async def update_trip(
     trip_id: UUID,
     trip: TripCreate,
     trip_service: TripService = Depends(get_trip_service),
-    current_user_id=Depends(get_current_user_id),
 ) -> TripResponse:
-    return await trip_service.update_trip(trip_id, trip, current_user_id)
+    return await trip_service.update_trip(trip_id, trip)
 
 
 @router.delete("/delete_trip/{trip_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_trip(
     trip_id: UUID,
     trip_service: TripService = Depends(get_trip_service),
-    current_user_id=Depends(get_current_user_id),
-) -> None:
-    return await trip_service.delete_trip(trip_id, current_user_id)
+):
+    await trip_service.delete_trip(trip_id)
